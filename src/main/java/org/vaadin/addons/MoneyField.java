@@ -47,12 +47,14 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
 
     /**
-     * Constructs an empty {@code MoneyField} with the given initial value and currencyCodes.
+     * Constructs an empty {@code MoneyField} with the given initial value and currencyCodes. Amounts are formatted on-the-fly using the
+     * given formatter.
      *
      * @param initialValue the initial value
+     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
      * @param currencyCodes the currencyCodes to set in the currency selection
      */
-    public MoneyField(MonetaryAmount initialValue, List<String> currencyCodes) {
+    public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter, List<String> currencyCodes) {
         super(initialValue);
 
         if (initialValue != null && !currencyCodes.contains(initialValue.getCurrency().getCurrencyCode())) {
@@ -65,7 +67,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         amount = new TextField();
         amount.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         amount.setSizeUndefined();
-        new NumeralFieldFormatter(".", ",", 3).extend(amount);
+        formatter.extend(amount);
 
         currency = new ComboBox<>();
         currency.setItems(currencyCodes);
@@ -102,7 +104,17 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param initialValue the initial value
      */
     public MoneyField(MonetaryAmount initialValue) {
-        this(initialValue, getAvailableCurrencyCodes());
+        this(initialValue, new NumeralFieldFormatter(".", ",", 3));
+    }
+
+    /**
+     * Constructs an empty {@code MoneyField} with the given initial value and formatter.
+     *
+     * @param initialValue the initial value
+     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     */
+    public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
+        this(initialValue, formatter, getAvailableCurrencyCodes());
     }
 
     /**
@@ -111,7 +123,17 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param currency the initial currency
      */
     public MoneyField(CurrencyUnit currency) {
-        this();
+        this(new NumeralFieldFormatter(".", ",", 3), currency);
+    }
+
+    /**
+     * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
+     *
+     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param currency the initial currency
+     */
+    public MoneyField(NumeralFieldFormatter formatter, CurrencyUnit currency) {
+        this(formatter);
         setCurrency(currency);
     }
 
@@ -121,8 +143,27 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param currency the initial currency
      */
     public MoneyField(Currency currency) {
-        this();
+        this(new NumeralFieldFormatter(".", ",", 3), currency);
+    }
+
+    /**
+     * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
+     *
+     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param currency the initial currency
+     */
+    public MoneyField(NumeralFieldFormatter formatter, Currency currency) {
+        this(formatter);
         setCurrency(currency);
+    }
+
+    /**
+     * Constructs an empty {@code MoneyField} with the given formatter.
+     *
+     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     */
+    public MoneyField(NumeralFieldFormatter formatter) {
+        this((MonetaryAmount) null, formatter);
     }
 
     private static List<String> getAvailableCurrencyCodes() {
@@ -156,8 +197,8 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param label the text to set as the label
      * @param initialValue the initial value
      */
-    public MoneyField(String label, MonetaryAmount initialValue) {
-        this(initialValue);
+    public MoneyField(String label, MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
+        this(initialValue, formatter);
         setLabel(label);
     }
 
@@ -170,8 +211,8 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @see #setValue(Object)
      * @see #setPlaceholder(String)
      */
-    public MoneyField(String label, MonetaryAmount initialValue, String placeholder) {
-        this(label, initialValue);
+    public MoneyField(String label, MonetaryAmount initialValue, NumeralFieldFormatter formatter, String placeholder) {
+        this(label, initialValue, formatter);
         amount.setPlaceholder(placeholder);
     }
 
