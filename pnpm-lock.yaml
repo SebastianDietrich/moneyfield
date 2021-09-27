@@ -12,6 +12,7 @@ dependencies:
   '@vaadin/vaadin-checkbox': 21.0.1
   '@vaadin/vaadin-combo-box': 21.0.1
   '@vaadin/vaadin-context-menu': 21.0.1
+  '@vaadin/vaadin-cookie-consent': 21.0.1
   '@vaadin/vaadin-core-shrinkwrap': 21.0.1
   '@vaadin/vaadin-custom-field': 21.0.1
   '@vaadin/vaadin-date-picker': 21.0.1
@@ -1587,6 +1588,17 @@ packages:
     dev: false
     resolution:
       integrity: sha512-sppjA2mamHZVCnH9pxj7NAhiQc7+9s+AvTI9l1W59EIcsDkElIXWT/WdDr0FUv7bZo6vk5JLVvSJaqlYh4EPoA==
+  /@vaadin/vaadin-cookie-consent/21.0.1:
+    dependencies:
+      '@polymer/polymer': 3.2.0
+      '@vaadin/vaadin-element-mixin': 21.0.1
+      '@vaadin/vaadin-license-checker': 2.1.2
+      '@vaadin/vaadin-lumo-styles': 21.0.1
+      '@vaadin/vaadin-material-styles': 21.0.1
+      cookieconsent: 3.1.1
+    dev: false
+    resolution:
+      integrity: sha512-WdGGzJzgRtJrAWUSPr9MhzPAFzgvduKr5+5zX/7d4gBCMg2/rrrKypngO0iJ6UaxtCgwTsQ4FoWrCC83TGccSw==
   /@vaadin/vaadin-core-shrinkwrap/21.0.1:
     dependencies:
       '@polymer/iron-a11y-announcer': 3.0.2
@@ -1777,6 +1789,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-RSoP00KckMIX09iauazvLpVzDO5fRsklNWwKg/JhuNrIkoVkYsD1lxMiyra1oufJu3z0nfp5RtSG031Rpt/kuw==
+  /@vaadin/vaadin-license-checker/2.1.2:
+    dependencies:
+      '@vaadin/vaadin-development-mode-detector': 2.0.4
+    dev: false
+    resolution:
+      integrity: sha512-oD6/MoavXyIZp6NWhkbJD5RKrpiWohhaQpgqjM0bFIthRr+1NoiG5R1w0uY3NIdMDuaXlsUFSQJ/Viz1v7F/jQ==
   /@vaadin/vaadin-list-box/21.0.1:
     dependencies:
       '@polymer/polymer': 3.2.0
@@ -3461,6 +3479,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==
+  /cookieconsent/3.1.1:
+    dev: false
+    resolution:
+      integrity: sha512-v8JWLJcI7Zs9NWrs8hiVldVtm3EBF70TJI231vxn6YToBGj0c9dvdnYwltydkAnrbBMOM/qX1xLFrnTfm5wTag==
   /copy-concurrently/1.0.5:
     dependencies:
       aproba: 1.2.0
@@ -8243,6 +8265,7 @@ specifiers:
   '@vaadin/vaadin-checkbox': 21.0.1
   '@vaadin/vaadin-combo-box': 21.0.1
   '@vaadin/vaadin-context-menu': 21.0.1
+  '@vaadin/vaadin-cookie-consent': 21.0.1
   '@vaadin/vaadin-core-shrinkwrap': 21.0.1
   '@vaadin/vaadin-custom-field': 21.0.1
   '@vaadin/vaadin-date-picker': 21.0.1
