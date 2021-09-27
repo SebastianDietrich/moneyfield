@@ -51,7 +51,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * given formatter.
      *
      * @param initialValue the initial value
-     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      * @param currencyCodes the currencyCodes to set in the currency selection
      */
     public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter, List<String> currencyCodes) {
@@ -111,7 +111,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * Constructs an empty {@code MoneyField} with the given initial value and formatter.
      *
      * @param initialValue the initial value
-     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      */
     public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
         this(initialValue, formatter, getAvailableCurrencyCodes());
@@ -129,7 +129,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
      *
-     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      * @param currency the initial currency
      */
     public MoneyField(NumeralFieldFormatter formatter, CurrencyUnit currency) {
@@ -149,7 +149,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
      *
-     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      * @param currency the initial currency
      */
     public MoneyField(NumeralFieldFormatter formatter, Currency currency) {
@@ -160,7 +160,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * Constructs an empty {@code MoneyField} with the given formatter.
      *
-     * @Param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      */
     public MoneyField(NumeralFieldFormatter formatter) {
         this((MonetaryAmount) null, formatter);
@@ -196,6 +196,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      *
      * @param label the text to set as the label
      * @param initialValue the initial value
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      */
     public MoneyField(String label, MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
         this(initialValue, formatter);
@@ -207,6 +208,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      *
      * @param label the text to set as the label
      * @param initialValue the initial value
+     * @param formatter the NumeralFieldFormatter to use for formatting input and output
      * @param placeholder the placeholder text to set
      * @see #setValue(Object)
      * @see #setPlaceholder(String)
