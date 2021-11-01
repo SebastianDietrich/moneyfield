@@ -1,10 +1,6 @@
 package org.vaadin.addons;
 
-import com.vaadin.flow.component.AbstractCompositeField;
-import com.vaadin.flow.component.HasLabel;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
@@ -18,7 +14,6 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 
@@ -26,14 +21,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.javamoney.moneta.FastMoney;
 import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
-@Tag("money-field")
-// @JsModule("@polymer/money-field/money-field.js")
-// @NpmPackage(value = "@polymer/money-field", version = "^3.0.1")
-/*
- * If you wish to include your own JS modules in the add-on jar, add the module files to './src/main/resources/META-INF/resources/frontend'
- * and insert an annotation @JsModule("./my-module.js") here.
+/**
+ * Composite component for a JSR-354 {@code MonetaryAmount} consisting of a {@code TextField} for the amount and a {@code ComboBox} for the
+ * currency.
+ *
+ * @author Sebastian Dietrich
  */
-public class MoneyField extends AbstractCompositeField<Div, MoneyField, MonetaryAmount> implements HasLabel, HasSize {
+@Tag("money-field")
+public class MoneyField extends AbstractCompositeField<Div, MoneyField, MonetaryAmount> implements HasLabel, HasSize, HasValidation {
     private static final long serialVersionUID = -6563463270512422984L;
 
     private TextField amount;
@@ -50,8 +45,8 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * Constructs an empty {@code MoneyField} with the given initial value and currencyCodes. Amounts are formatted on-the-fly using the
      * given formatter.
      *
-     * @param initialValue the initial value
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param initialValue the initial {@code MonetaryAmount}
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      * @param currencyCodes the currencyCodes to set in the currency selection
      */
     public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter, List<String> currencyCodes) {
@@ -65,7 +60,6 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         }
 
         amount = new TextField();
-        amount.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         amount.setSizeUndefined();
         formatter.extend(amount);
 
@@ -111,7 +105,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * Constructs an empty {@code MoneyField} with the given initial value and formatter.
      *
      * @param initialValue the initial value
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      */
     public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
         this(initialValue, formatter, getAvailableCurrencyCodes());
@@ -129,7 +123,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
      *
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      * @param currency the initial currency
      */
     public MoneyField(NumeralFieldFormatter formatter, CurrencyUnit currency) {
@@ -149,7 +143,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
      *
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      * @param currency the initial currency
      */
     public MoneyField(NumeralFieldFormatter formatter, Currency currency) {
@@ -160,7 +154,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * Constructs an empty {@code MoneyField} with the given formatter.
      *
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      */
     public MoneyField(NumeralFieldFormatter formatter) {
         this((MonetaryAmount) null, formatter);
@@ -196,7 +190,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      *
      * @param label the text to set as the label
      * @param initialValue the initial value
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      */
     public MoneyField(String label, MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
         this(initialValue, formatter);
@@ -208,7 +202,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      *
      * @param label the text to set as the label
      * @param initialValue the initial value
-     * @param formatter the NumeralFieldFormatter to use for formatting input and output
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      * @param placeholder the placeholder text to set
      * @see #setValue(Object)
      * @see #setPlaceholder(String)
@@ -223,6 +217,42 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         NumberFormat amountFormat = NumberFormat.getNumberInstance(Locale.GERMAN);
         amount.setValue(amountFormat.format(monetaryAmount.getNumber().numberValue(BigDecimal.class)));
         currency.setValue(monetaryAmount.getCurrency().getCurrencyCode());
+    }
+
+    /**
+     * Sets the currency.
+     * 
+     * @param currencyCode the ISO-4217 three letter currency code.
+     */
+    public void setCurrency(String currencyCode) {
+        currency.setValue(currencyCode);
+    }
+
+    /**
+     * Sets the currency.
+     * 
+     * @param currency the {@code CurrencyUnit} to set.
+     */
+    public void setCurrency(CurrencyUnit currency) {
+        setCurrency(currency.getCurrencyCode());
+    }
+
+    /**
+     * Sets the currency.
+     * 
+     * @param currency the {@code Currency} to set.
+     */
+    public void setCurrency(Currency currency) {
+        setCurrency(currency.getCurrencyCode());
+    }
+
+    /**
+     * Sets the amount.
+     * 
+     * @param amount the {@code Number} to set as amount.
+     */
+    public void setAmount(Number amount) {
+        this.amount.setValue(amount.toString());
     }
 
     /**
@@ -263,12 +293,24 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         return amount.getPlaceholder();
     }
 
+    /**
+     * Handle component enable state when the enabled state changes.
+     * <p>
+     * This sets the enabled state of both the amount and currency fields.
+     *
+     * @param enabled the new enabled state of the component
+     */
     @Override
     public void onEnabledStateChanged(boolean enabled) {
         amount.setEnabled(enabled);
         currency.setEnabled(enabled);
     }
 
+    /**
+     * Sets the read-only mode of this {@code MoneyField} to given mode. The user can't change the values when in read-only mode.
+     *
+     * @param readOnly a boolean value specifying whether the component is put in read-only mode or not
+     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
@@ -282,20 +324,66 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         amount.setRequiredIndicatorVisible(requiredIndicatorVisible);
     }
 
-    public void setCurrency(String currencyCode) {
-        currency.setValue(currencyCode);
+    /**
+     * Adds theme variants to the component.
+     *
+     * @param variants theme variants to add
+     */
+    public void addThemeVariants(TextFieldVariant... variants) {
+        amount.addThemeVariants(variants);
     }
 
-    public void setCurrency(CurrencyUnit currency) {
-        setCurrency(currency.getCurrencyCode());
+    /**
+     * Removes theme variants from the component.
+     *
+     * @param variants theme variants to remove
+     */
+    public void removeThemeVariants(TextFieldVariant... variants) {
+        amount.removeThemeVariants(variants);
     }
 
-    public void setCurrency(Currency currency) {
-        setCurrency(currency.getCurrencyCode());
+    /**
+     * Gets the error to show when the input value is invalid.
+     * <p>
+     * This property is not synchronized automatically from the client side, so the returned value may not be the same as in client side.
+     * </p>
+     *
+     * @return the {@code errorMessage} property from the webcomponent
+     */
+    @Override
+    public String getErrorMessage() {
+        return amount.getErrorMessage();
     }
 
-    public void setAmount(Number amount) {
-        this.amount.setValue(amount.toString());
+    /**
+     * Sets the error to show when the input value is invalid.
+     *
+     * @param errorMessage the String value to set
+     */
+    @Override
+    public void setErrorMessage(String errorMessage) {
+        amount.setErrorMessage(errorMessage);
     }
+
+    /**
+     * This property is set to true when the control value is invalid.
+     *
+     * @return the {@code invalid} property from the webcomponent
+     */
+    @Override
+    public boolean isInvalid() {
+        return amount.isInvalid();
+    }
+
+    /**
+     * This property is set to true when the control value is invalid.
+     *
+     * @param invalid the boolean value to set
+     */
+    @Override
+    public void setInvalid(boolean invalid) {
+        amount.setInvalid(invalid);
+    }
+
 
 }

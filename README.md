@@ -7,6 +7,7 @@ Vaadin 21+ implementation of a field for JSR354 javax.money.MonetaryAmount that 
 
 ## Development instructions
 [![Build Status](https://app.travis-ci.com/SebastianDietrich/moneyfield.svg?branch=main)](https://travis-ci.com/SebastianDietrich/moneyfield)
+[![Stability: Active](https://masterminds.github.io/stability/active.svg)](https://masterminds.github.io/stability/active.html)
 
 Pure java implementation of a composite field based on AbstractCompositeField<Div, MoneyField, MonetaryAmount>. Formatting of amount can be set in constructor and is done using javascript on-the-fly during text input using [TextField Formatter](https://vaadin.com/directory/component/textfield-formatter).
 
