@@ -18,7 +18,7 @@ import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 
 import org.apache.commons.lang3.StringUtils;
-import org.javamoney.moneta.FastMoney;
+import org.javamoney.moneta.Money;
 import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 /**
@@ -86,10 +86,10 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         getContent().add(layout);
     }
 
-    private FastMoney asMonetaryAmount() {
+    private Money asMonetaryAmount() {
         if (StringUtils.isEmpty(amount.getValue()) || StringUtils.isEmpty(currency.getValue())) return null;
 
-        return FastMoney.of(new BigDecimal(amount.getValue().replace(".", "").replace(',', '.')), currency.getValue());
+        return Money.of(new BigDecimal(amount.getValue().replace(".", "").replace(',', '.')), currency.getValue());
     }
 
     /**
