@@ -121,6 +121,15 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
 
     /**
+     * Constructs an empty {@code MoneyField} with the given initial value for the currency.
+     *
+     * @param currency the initial currency
+     */
+    public MoneyField(Currency currency) {
+        this(new NumeralFieldFormatter(".", ",", 3), currency);
+    }
+    
+    /**
      * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
      *
      * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
@@ -132,12 +141,50 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
 
     /**
-     * Constructs an empty {@code MoneyField} with the given initial value for the currency.
+     * Constructs an empty {@code MoneyField} with the given formatter and initial value for the currency.
      *
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
+     * @param currencyCode the ISO-4217 three letter currency code.
+     */
+    public MoneyField(NumeralFieldFormatter formatter, String currencyCode) {
+        this(formatter);
+        setCurrency(currencyCode);
+    }
+   
+    /**
+     * Constructs an empty {@code MoneyField} with the given label and initial value for the currency.
+     *
+     * @param label the text to set as the label
      * @param currency the initial currency
      */
-    public MoneyField(Currency currency) {
-        this(new NumeralFieldFormatter(".", ",", 3), currency);
+    public MoneyField(String label, Currency currency) {
+        this();
+        setLabel(label);
+        setCurrency(currency);
+    }
+    
+    /**
+     * Constructs an empty {@code MoneyField} with the given label and initial value for the currency.
+     *
+     * @param label the text to set as the label
+     * @param currency the initial currency
+     */
+    public MoneyField(String label, CurrencyUnit currency) {
+        this();
+        setLabel(label);
+        setCurrency(currency);
+    }
+    
+    /**
+     * Constructs an empty {@code MoneyField} with the given label and initial value for the currency.
+     *
+     * @param label the text to set as the label
+     * @param currencyCode the ISO-4217 three letter currency code.
+     */
+    public MoneyField(String label, String currencyCode) {
+        this();
+        setLabel(label);
+        setCurrency(currencyCode);
     }
 
     /**
@@ -172,17 +219,6 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     public MoneyField(String label) {
         this();
         setLabel(label);
-    }
-
-    /**
-     * Constructs an empty {@code MoneyField} with the given label and placeholder text.
-     *
-     * @param label the text to set as the label
-     * @param placeholder the placeholder text to set
-     */
-    public MoneyField(String label, String placeholder) {
-        this(label);
-        amount.setPlaceholder(placeholder);
     }
 
     /**
