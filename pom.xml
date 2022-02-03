@@ -5,7 +5,7 @@
 
     <groupId>org.vaadin.addons.e-movimento</groupId>
     <artifactId>moneyfield</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>MoneyField</name>
     <description>Field to hold both monetary amount and currency</description>
 
@@ -21,7 +21,7 @@
 
         <jetty.version>9.4.28.v20200408</jetty.version>
         <moneta.version>1.4.2</moneta.version> <!-- see https://mvnrepository.com/artifact/org.javamoney/moneta -->
-        <textfieldformatter.version>5.2.0</textfieldformatter.version> <!-- see https://mvnrepository.com/artifact/org.vaadin/textfieldformatter?repo=vaadin-addons -->
+        <textfieldformatter.version>5.3.0</textfieldformatter.version> <!-- see https://mvnrepository.com/artifact/org.vaadin/textfieldformatter?repo=vaadin-addons -->
     </properties>
 
     <organization>
