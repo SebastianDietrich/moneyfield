@@ -60,10 +60,12 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         }
 
         amount = new TextField();
+        amount.setId("amount");
         amount.setSizeUndefined();
         formatter.extend(amount);
 
         currency = new ComboBox<>();
+        currency.setId("currency");
         currency.setItems(currencyCodes);
         currency.setWidth(6, Unit.EM);
 
@@ -290,7 +292,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     public void setAmount(Number amount) {
         this.amount.setValue(amount.toString());
     }
-
+    
     /**
      * Set the label of the component to the given text.
      *

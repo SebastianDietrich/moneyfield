@@ -5,12 +5,12 @@
 
     <groupId>org.vaadin.addons.e-movimento</groupId>
     <artifactId>moneyfield</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
     <name>MoneyField</name>
     <description>Field to hold both monetary amount and currency</description>
 
     <properties>
-        <vaadin.version>21.0.3</vaadin.version>
+        <vaadin.version>21.0.9</vaadin.version> <!-- see https://mvnrepository.com/artifact/com.vaadin/vaadin -->
 
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -21,7 +21,10 @@
 
         <jetty.version>9.4.28.v20200408</jetty.version>
         <moneta.version>1.4.2</moneta.version> <!-- see https://mvnrepository.com/artifact/org.javamoney/moneta -->
-        <textfieldformatter.version>5.3.0</textfieldformatter.version> <!-- see https://mvnrepository.com/artifact/org.vaadin/textfieldformatter?repo=vaadin-addons -->
+        <textfieldformatter.version>5.4.0</textfieldformatter.version> <!-- see https://mvnrepository.com/artifact/org.vaadin/textfieldformatter?repo=vaadin-addons -->
+
+        <karibu-testing.version>1.3.21</karibu-testing.version> <!-- <https://mvnrepository.com/artifact/com.github.mvysny.kaributesting/karibu-testing-v10> -->
+        <junit-jupiter.version>5.9.2</junit-jupiter.version> <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
     </properties>
 
     <organization>
@@ -150,21 +153,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- junit-jupiter used for testing moneyfield -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-testbench</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
 
+        <!-- dependency for ui-testing without browser -->
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>3.8.1</version>
+            <groupId>com.github.mvysny.kaributesting</groupId>
+            <artifactId>karibu-testing-v10</artifactId>
+            <version>${karibu-testing.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

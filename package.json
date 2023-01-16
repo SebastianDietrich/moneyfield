@@ -45,7 +45,7 @@
     "@vaadin/vaadin-upload": "21.0.2",
     "@vaadin/vaadin-virtual-list": "21.0.2",
     "cleave.js": "1.6.0",
-    "construct-style-sheets-polyfill": "2.4.16",
+    "construct-style-sheets-polyfill": "3.0.4",
     "lit": "2.0.0",
     "multiselect-combo-box": "2.4.2"
   },
@@ -121,7 +121,7 @@
       "@vaadin/vaadin-upload": "21.0.2",
       "@vaadin/vaadin-virtual-list": "21.0.2",
       "cleave.js": "1.6.0",
-      "construct-style-sheets-polyfill": "2.4.16",
+      "construct-style-sheets-polyfill": "3.0.4",
       "lit": "2.0.0",
       "multiselect-combo-box": "2.4.2"
     },
