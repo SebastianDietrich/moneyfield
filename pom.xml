@@ -10,7 +10,7 @@
     <description>Field to hold both monetary amount and currency</description>
 
     <properties>
-        <vaadin.version>21.0.9</vaadin.version> <!-- see https://mvnrepository.com/artifact/com.vaadin/vaadin -->
+        <vaadin.version>23.2.13</vaadin.version> <!-- see https://mvnrepository.com/artifact/com.vaadin/vaadin -->
 
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>

@@ -13,7 +13,9 @@ import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 
@@ -30,6 +32,9 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 @Tag("money-field")
 public class MoneyField extends AbstractCompositeField<Div, MoneyField, MonetaryAmount> implements HasLabel, HasSize, HasValidation {
     private static final long serialVersionUID = -6563463270512422984L;
+    
+    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)([.,\\d]+)$");
+    private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)([.,\\d]+)(?:\\s*([-+*\\/])\\s*((?:\\s[-+])?[.,\\d]+)\\s*)*$");
 
     private TextField amount;
     private ComboBox<String> currency;
@@ -38,7 +43,14 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * Constructs an empty {@code MoneyField}.
      */
     public MoneyField() {
-        this((MonetaryAmount) null);
+        this(false);
+    }
+    
+    /**
+     * Constructs an empty {@code MoneyField} that can possibly be calculated.
+     */
+    public MoneyField(boolean calculable) {
+        this((MonetaryAmount) null, calculable);
     }
 
     /**
@@ -48,8 +60,9 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param initialValue the initial {@code MonetaryAmount}
      * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      * @param currencyCodes the currencyCodes to set in the currency selection
+     * @param calculable
      */
-    public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter, List<String> currencyCodes) {
+    public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter, List<String> currencyCodes, boolean calculable) {
         super(initialValue);
 
         if (initialValue != null && !currencyCodes.contains(initialValue.getCurrency().getCurrencyCode())) {
@@ -58,21 +71,22 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                     initialValue.getCurrency().getCurrencyCode() +
                     "' is not in the list of currency codes.");
         }
-
         amount = new TextField();
         amount.setId("amount");
         amount.setSizeUndefined();
+        if (calculable) amount.setAllowedCharPattern("-+.,d");
+        else amount.setAllowedCharPattern("-+*/.,d");
         formatter.extend(amount);
 
         currency = new ComboBox<>();
         currency.setId("currency");
         currency.setItems(currencyCodes);
-        currency.setWidth(6, Unit.EM);
+        currency.setWidth(6, Unit.EM);  
 
         setValue(initialValue);
 
         amount.addValueChangeListener(listener -> {
-            setModelValue(asMonetaryAmount(), true);
+            setModelValue(calculable ? asCalculableMonetaryAmount() : asMonetaryAmount(), true);
         });
         currency.addValueChangeListener(listener -> {
             setModelValue(asMonetaryAmount(), true);
@@ -87,20 +101,131 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
 
         getContent().add(layout);
     }
+    
+    private Money asCalculableMonetaryAmount() {
+        if (StringUtils.isEmpty(amount.getValue()) || StringUtils.isEmpty(currency.getValue())) return null;
+        String calculableNumber = amount.getValue().replace(".", "").replace(',', '.').replace(" ", "");
+        
+        if (CALCULABLE_AMOUNT_PATTERN.matcher(calculableNumber).matches()) {
+            this.setInvalid(false);
+            try {
+                return Money.of(eval(calculableNumber), currency.getValue());
+            } catch (NumberFormatException e) {
+                // even the matcher can't find all illegal combination, so we need to catch this and set invalid
+            }
+        }
+        this.setInvalid(true);
+        return null;
+    }
 
     private Money asMonetaryAmount() {
         if (StringUtils.isEmpty(amount.getValue()) || StringUtils.isEmpty(currency.getValue())) return null;
-
-        return Money.of(new BigDecimal(amount.getValue().replace(".", "").replace(',', '.')), currency.getValue());
+        String number = amount.getValue().replace(".", "").replace(',', '.').replace(" ", "");
+        
+        if (AMOUNT_PATTERN.matcher(number).matches()) {
+            this.setInvalid(false);
+            try {
+                return Money.of(new BigDecimal(number), currency.getValue());
+            } catch (NumberFormatException e) {
+                // even the matcher can't find all illegal numbers, so we need to catch this and set invalid
+            }
+        }
+        this.setInvalid(true);
+        return null;
     }
-
+    
+    /**
+     * Evaluate arithmetic expression including +, -, *, /, ()
+     * 
+     * @see https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form (removed functions like sin, sqrt, ...)
+     * @throws IllegalArgumentException when the expression is invalid
+     */
+    private BigDecimal eval(final String str) {
+        return new Object() {
+            int pos = -1, ch;
+            
+            void nextChar() {
+                ch = (++pos < str.length()) ? str.charAt(pos) : -1;
+            }
+            
+            boolean eat(int charToEat) {
+                while (ch == ' ') nextChar();
+                if (ch == charToEat) {
+                    nextChar();
+                    return true;
+                }
+                return false;
+            }
+            
+            BigDecimal parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < str.length()) throw new IllegalArgumentException("Unexpected: " + (char)ch);
+                return new BigDecimal(x);
+            }
+            
+            // Grammar:
+            // expression = term | expression `+` term | expression `-` term
+            // term = factor | term `*` factor | term `/` factor
+            // factor = `+` factor | `-` factor | `(` expression `)` | factor `^` factor
+            
+            double parseExpression() {
+                double x = parseTerm();
+                for (;;) {
+                    if      (eat('+')) x += parseTerm(); // addition
+                    else if (eat('-')) x -= parseTerm(); // subtraction
+                    else return x;
+                }
+            }
+            
+            double parseTerm() {
+                double x = parseFactor();
+                for (;;) {
+                    if      (eat('*')) x *= parseFactor(); // multiplication
+                    else if (eat('/')) x /= parseFactor(); // division
+                    else return x;
+                }
+            }
+            
+            double parseFactor() {
+                if (eat('+')) return +parseFactor(); // unary plus
+                if (eat('-')) return -parseFactor(); // unary minus
+                
+                double x;
+                int startPos = this.pos;
+                if (eat('(')) { // parentheses
+                    x = parseExpression();
+                    if (!eat(')')) throw new IllegalArgumentException("Missing ')'");
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    x = Double.parseDouble(str.substring(startPos, this.pos));
+                } else {
+                    throw new IllegalArgumentException("Unexpected: " + (char)ch);
+                }
+                
+                if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+                
+                return x;
+            }
+        }.parse();
+    }
+    
     /**
      * Constructs an empty {@code MoneyField} with the given initial value.
      *
      * @param initialValue the initial value
      */
     public MoneyField(MonetaryAmount initialValue) {
-        this(initialValue, new NumeralFieldFormatter(".", ",", 3));
+        this(initialValue, false);
+    }
+    
+    /**
+     * Constructs an empty {@code MoneyField} with the given initial value that can be possibly calculated.
+     *
+     * @param initialValue the initial value
+     */
+    public MoneyField(MonetaryAmount initialValue, boolean calculable) {
+        this(initialValue, new NumeralFieldFormatter(".", ",", 3), calculable);
     }
 
     /**
@@ -110,7 +235,17 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
      */
     public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter) {
-        this(initialValue, formatter, getAvailableCurrencyCodes());
+        this(initialValue, formatter, getAvailableCurrencyCodes(), false);
+    }
+    
+    /**
+     * Constructs an empty {@code MoneyField} with the given initial value and formatter.
+     *
+     * @param initialValue the initial value
+     * @param formatter the {@code NumeralFieldFormatter} to use for formatting input and output
+     */
+    public MoneyField(MonetaryAmount initialValue, NumeralFieldFormatter formatter, boolean calculable) {
+        this(initialValue, formatter, getAvailableCurrencyCodes(), calculable);
     }
 
     /**
@@ -219,7 +354,16 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param label the text to set as the label
      */
     public MoneyField(String label) {
-        this();
+        this(label, false);
+    }
+    
+    /**
+     * Constructs an empty {@code MoneyField} with the given label that can be possibly calculated.
+     *
+     * @param label the text to set as the label
+     */
+    public MoneyField(String label, boolean calculable) {
+        this(calculable);
         setLabel(label);
     }
 

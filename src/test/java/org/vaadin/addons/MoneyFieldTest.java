@@ -15,15 +15,16 @@ import org.junit.jupiter.api.Test;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._assertOne;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._get;
-import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
+import static com.github.mvysny.kaributesting.v10.LocatorJ._setValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests the View containing the MoneyField. Uses the Browserless testing approach as provided by the
  * [Karibu Testing](https://github.com/mvysny/karibu-testing) library.
  */
-public class ViewTest {
+public class MoneyFieldTest {
     private static Routes routes;
 
     @BeforeAll
@@ -85,6 +86,9 @@ public class ViewTest {
         MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
 
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "-123,456");
+        
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
         
         assertEquals(-123.456, model.getMoney().getNumber().doubleValue());
@@ -102,5 +106,89 @@ public class ViewTest {
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
         
         assertEquals(543.21, model.getMoney().getNumber().doubleValue());
+    }
+    
+    @Test
+    public void testSetAmountWithDotComma() {
+        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "-5.214,12");
+        
+        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        
+        assertEquals(-5214.12, model.getMoney().getNumber().doubleValue());
+    }
+    
+    @Test
+    public void testSetAmountWithNonNumericValue() {
+        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "f5.214,12f");
+        
+        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        
+        assertNull(model.getMoney());
+    }
+    
+    @Test
+    public void testCalculateAmount() {
+        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+        
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "1+2+3");
+
+        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        
+        assertEquals(6, model.getMoney().getNumber().doubleValue());
+    }
+    
+    @Test
+    public void testCalculateAmountWithDoubles() {
+        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+        
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "1,123+2,456+3,789");
+
+        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        
+        assertEquals(7.368, model.getMoney().getNumber().doubleValue());
+    }
+    
+    @Test
+    public void testCalculateAmountWithSpaces() {
+        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+        
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "1,1 + 2,2 + 3,3");
+
+        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        
+        assertEquals(6.6, model.getMoney().getNumber().doubleValue());
+    }
+    
+    @Test
+    public void testCalculateAmountWithAll4Operators() {
+        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+        
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        _setValue(amount, "1 + 2 * 3 / 4");
+
+        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        
+        assertEquals(2.5, model.getMoney().getNumber().doubleValue());
     }
 }

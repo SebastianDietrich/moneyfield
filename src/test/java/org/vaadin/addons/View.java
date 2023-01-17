@@ -15,7 +15,7 @@ public class View extends Div {
     private Model model;
 
     public View() {
-        money = new MoneyField("money");
+        money = new MoneyField("money", true);
         Button button = new Button("Ok");
         add(money, button);
         
