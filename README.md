@@ -3,12 +3,20 @@
 
 # Moneyfield
 
-Vaadin 21+ implementation of a field for JSR354 javax.money.MonetaryAmount that includes both an amount and a currency.
+Vaadin 23+ implementation of a field for JSR354 javax.money.MonetaryAmount that includes both an amount and a currency.
+
+Pure java implementation of a composite field based on AbstractCompositeField<Div, MoneyField, MonetaryAmount>.
+
+The entered amount must match the locale (with optional grouping) - e.g. 1 234,56 or 1234,56 for Poland 1,234.56 or 1234.56 for US.
+The amount gets rounded and formatted (with grouping) upon losing focus (e.g. 1,23,456.789 -> 1,23,456.79 for India).
+
+Optionally primitive arithmetic calculations (e.g. ((-1+2)*3 - 1)/-4) are allowed and calculated upon losing focus 
+
 
 ## Development instructions
 [![Build Status](https://app.travis-ci.com/SebastianDietrich/moneyfield.svg?branch=main)](https://travis-ci.com/SebastianDietrich/moneyfield)
 
-Pure java implementation of a composite field based on AbstractCompositeField<Div, MoneyField, MonetaryAmount>. Formatting of amount can be set in constructor and is done using javascript on-the-fly during text input using [TextField Formatter](https://vaadin.com/directory/component/textfield-formatter).
+
 
 ## Publishing to Vaadin Directory
 
