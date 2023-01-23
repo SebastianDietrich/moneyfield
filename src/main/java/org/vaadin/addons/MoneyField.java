@@ -26,7 +26,7 @@ import org.javamoney.moneta.Money;
  * Composite component for a JSR-354 {@code MonetaryAmount} consisting of a {@code TextField} for the amount and a {@code ComboBox} for the
  * currency.
  * Note that money entries are automatically formatted and rounded according to the <code>java.util.Locale</code> of this component.
- * This means that for e.g. 1234.567 with Locale("en", "US") results in 1.234.57 but with Locale("de", "DE") it results in 1.234.567
+ * This means that for e.g. 1234.567 with Locale("en", "US") results in 1,234.57 but with Locale("de", "DE") it results in 1.234.567
  *
  * @author Sebastian Dietrich
  */
@@ -39,7 +39,14 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     private static final String NUMBER_CHARS = "0123456789., \u00a0"; //all allowed characters in a number (including space and &nbsp; for polish numbers)
     private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)(\\h*([-+*/]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
     
+    /**
+     * The amount part of this component.
+     */
     private TextField amount;
+    
+    /**
+     * The currency part of this component.
+     */
     private ComboBox<String> currency;
 
     /**
@@ -51,6 +58,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     
     /**
      * Constructs an empty {@code MoneyField} that can possibly be calculated.
+     * @param calculable if the field allows basic arithmetic expressions to be calculated
      */
     public MoneyField(boolean calculable) {
         this((MonetaryAmount) null, calculable);
@@ -61,7 +69,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      *
      * @param initialValue the initial {@code MonetaryAmount}
      * @param currencyCodes the currencyCodes to set in the currency selection
-     * @param calculable
+     * @param calculable if the field allows basic arithmetic expressions to be calculated
      */
     public MoneyField(MonetaryAmount initialValue, List<String> currencyCodes, boolean calculable) {
         super(initialValue);
@@ -206,7 +214,6 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * Constructs an empty {@code MoneyField} with the given initial value and formatter.
      *
      * @param initialValue the initial value
-     * @param calculable if the field allows basic arithmetic expressions to be calculated
      */
     public MoneyField(MonetaryAmount initialValue) {
         this(initialValue, getAvailableCurrencyCodes(), false);
@@ -295,6 +302,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * Constructs an empty {@code MoneyField} with the given label that can be possibly calculated.
      *
      * @param label the text to set as the label
+     * @param calculable if the field allows basic arithmetic expressions to be calculated
      */
     public MoneyField(String label, boolean calculable) {
         this(calculable);

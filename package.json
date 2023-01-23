@@ -104,7 +104,6 @@
     "@vaadin/vaadin-virtual-list": "23.2.12",
     "@vaadin/vertical-layout": "23.2.12",
     "@vaadin/virtual-list": "23.2.12",
-    "cleave.js": "1.6.0",
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
     "lit": "2.3.1"
@@ -227,7 +226,6 @@
       "@vaadin/vaadin-virtual-list": "23.2.12",
       "@vaadin/vertical-layout": "23.2.12",
       "@vaadin/virtual-list": "23.2.12",
-      "cleave.js": "1.6.0",
       "construct-style-sheets-polyfill": "3.1.0",
       "date-fns": "2.29.3",
       "lit": "2.3.1"
@@ -248,7 +246,7 @@
       "workbox-core": "6.5.0",
       "workbox-precaching": "6.5.0"
     },
-    "hash": "c6be61f2a68a70dde4048cddba8b1ed01ba9b89f1f1df66f03ee94791bde2f30"
+    "hash": "9a1af9c6b91a77cfb13fe3acfe8402471b98d60af0d82f78b6185f28a156ed15"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -353,7 +351,6 @@
     "construct-style-sheets-polyfill": "$construct-style-sheets-polyfill",
     "lit": "$lit",
     "@vaadin/common-frontend": "$@vaadin/common-frontend",
-    "date-fns": "$date-fns",
-    "cleave.js": "$cleave.js"
+    "date-fns": "$date-fns"
   }
 }

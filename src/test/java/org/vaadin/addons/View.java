@@ -3,6 +3,7 @@ package org.vaadin.addons;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
@@ -19,7 +20,9 @@ public class View extends Div {
 
     public View() {
         UI.getCurrent().setLocale(new Locale("de", "DE"));
-        money = new MoneyField("money", true);
+        money = new MoneyField("Amount", true);
+        money.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        
         Button button = new Button("Ok");
         add(money, button);
         

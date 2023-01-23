@@ -74,7 +74,7 @@ public class MoneyFieldTest {
     @Test
     public void testSetAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(1, "EUR"));
         assertEquals("1,00", _get(TextField.class, spec -> spec.withId("amount")).getValue());
 
@@ -86,7 +86,7 @@ public class MoneyFieldTest {
     @Test
     public void testSetNegativeAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
 
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -101,7 +101,7 @@ public class MoneyFieldTest {
     @Test
     public void testLocale() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(123.456, "EUR"));
 
         Locale locale = UI.getCurrent().getLocale();
@@ -138,7 +138,7 @@ public class MoneyFieldTest {
     @Test
     public void testChangeAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -153,7 +153,7 @@ public class MoneyFieldTest {
     @Test
     public void testSetAmountWithDotComma() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
 
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -167,7 +167,7 @@ public class MoneyFieldTest {
     
     @Test
     public void testSetAmountWithNonNumericValue() {
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
 
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -179,7 +179,7 @@ public class MoneyFieldTest {
     
     @Test
     public void testSetAmountWithMatchingButStillNonNumericValue() {
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
 
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -190,7 +190,7 @@ public class MoneyFieldTest {
     @Test
     public void testCalculateAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -205,7 +205,7 @@ public class MoneyFieldTest {
     @Test
     public void testCalculateAmountWithDoubles() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -220,7 +220,7 @@ public class MoneyFieldTest {
     @Test
     public void testCalculateAmountWithSpaces() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -235,7 +235,7 @@ public class MoneyFieldTest {
     @Test
     public void testCalculateAmountWithAll4OperatorsAndParenthesis() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
@@ -250,7 +250,7 @@ public class MoneyFieldTest {
     @Test
     public void testCalculateAmountWithGrouping() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("money"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
