@@ -115,18 +115,18 @@
             <artifactId>moneta-core</artifactId>
             <version>${moneta.version}</version>
         </dependency>
-<dependency>
-    <groupId>com.ibm.icu</groupId>
-    <artifactId>icu4j</artifactId>
-    <version>${icu4j.version}</version>
-</dependency>
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>${icu4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-core</artifactId>
-<!-->            <exclusions>
-                <- Webjars are only needed when running in Vaadin 13 compatibility mode in V14. Your add-on can support npm in the same version 
+            <exclusions>
+                <!-- Webjars are only needed when running in Vaadin 13 compatibility mode in V14. Your add-on can support npm in the same version 
                     mode and V13 compatiblity mode at the same time, or with separate versions. Any V13 version should work with the compatibility mode in V14. -->
-<!-->                <exclusion>
+                <exclusion>
                     <groupId>com.vaadin.webjar</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
@@ -266,7 +266,7 @@
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
-                                <descriptor>assembly/assembly.xml</descriptor>
+                                <descriptor>src/main/assembly/assembly.xml</descriptor>
                             </descriptors>
                         </configuration>
                         <executions>
