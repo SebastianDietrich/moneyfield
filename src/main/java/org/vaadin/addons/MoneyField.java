@@ -42,12 +42,12 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     /**
      * The amount part of this component.
      */
-    private TextField amount;
+    private final TextField amount;
     
     /**
      * The currency part of this component.
      */
-    private ComboBox<String> currency;
+    private final ComboBox<String> currency;
 
     /**
      * Constructs an empty {@code MoneyField}.
@@ -117,10 +117,9 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         String formattedAmount;
         String textualAmount = amount.getValue();
         if ((calculable ? CALCULABLE_AMOUNT_PATTERN : AMOUNT_PATTERN).matcher(textualAmount).matches()) {
-          System.out.println("matches pattern: " + textualAmount);
           try {
               formattedAmount = currencyFormat.format(calculable ? eval(textualAmount, numberFormat) : numberFormat.parse(textualAmount));
-              amount.setValue(formattedAmount.replaceAll("[^\\d.,\\h-]", "").replaceAll("\\h+$", ""));
+              setAmount(formattedAmount);
               if (StringUtils.isEmpty(currency.getValue())) return;
               setModelValue(Money.of(currencyFormat.parse(formattedAmount), currency.getValue()), true);
               this.setInvalid(false);
@@ -284,6 +283,19 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         setLabel(label);
         setCurrency(currencyCode);
     }
+    
+    /**
+     * Constructs an empty, possibly calculable {@code MoneyField} with the given label and initial value for the currency.
+     *
+     * @param label the text to set as the label
+     * @param currencyCode the ISO-4217 three letter currency code.
+     * @param calculable if the field allows basic arithmetic expressions to be calculated
+     */
+    public MoneyField(String label, String currencyCode, boolean calculable) {
+        this(calculable);
+        setLabel(label);
+        setCurrency(currencyCode);
+    }
 
     private static List<String> getAvailableCurrencyCodes() {
         return Currency.getAvailableCurrencies().stream().map(Currency::getCurrencyCode).sorted().collect(Collectors.toList());
@@ -316,7 +328,18 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param initialValue the initial value
      */
     public MoneyField(String label, MonetaryAmount initialValue) {
-        this(initialValue);
+        this(label, initialValue, false);
+    }
+    
+    /**
+     * Constructs {@code MoneyField} with the given label and initial value.
+     *
+     * @param label the text to set as the label
+     * @param initialValue the initial value
+     * @param calculable if the field allows basic arithmetic expressions to be calculated
+     */
+    public MoneyField(String label, MonetaryAmount initialValue, boolean calculable) {
+        this(initialValue, calculable);
         setLabel(label);
     }
 
@@ -330,14 +353,29 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @see #setPlaceholder(String)
      */
     public MoneyField(String label, MonetaryAmount initialValue, String placeholder) {
-        this(label, initialValue);
+        this(label, initialValue, placeholder, false);
+    }
+    
+    /**
+     * Constructs a {@code MoneyField} with the given label, an initial value and placeholder text.
+     *
+     * @param label the text to set as the label
+     * @param initialValue the initial value
+     * @param placeholder the placeholder text to set
+     * @param calculable if the field allows basic arithmetic expressions to be calculated
+     * 
+     * @see #setValue(Object)
+     * @see #setPlaceholder(String)
+     */
+    public MoneyField(String label, MonetaryAmount initialValue, String placeholder, boolean calculable) {
+        this(label, initialValue, calculable);
         amount.setPlaceholder(placeholder);
     }
 
     @Override
     protected void setPresentationValue(MonetaryAmount monetaryAmount) {
-        amount.setValue(NumberFormat.getCurrencyInstance(getLocale()).format(monetaryAmount.getNumber().numberValue(BigDecimal.class)).replaceAll("[^\\d., -]", ""));
-        currency.setValue(monetaryAmount.getCurrency().getCurrencyCode());
+        setAmount(NumberFormat.getCurrencyInstance(getLocale()).format(monetaryAmount.getNumber().numberValue(BigDecimal.class)).replaceAll("[^\\d., -]", ""));
+        setCurrency(monetaryAmount.getCurrency().getCurrencyCode());
     }
 
     /**
@@ -347,6 +385,20 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      */
     public void setCurrency(String currencyCode) {
         currency.setValue(currencyCode);
+        if (!currency.isVisible()) {
+            showCurrencyInAmount(true);
+        }
+    }
+
+    /**
+     * Shows currency symbols as prefix in amount field.
+     */
+    private void showCurrencyInAmount(boolean show) {
+        if (show && currency.getValue() != null) {
+            amount.setPrefixComponent(new Div(new Text(Currency.getInstance(currency.getValue()).getSymbol(getLocale()))));
+        } else {
+            amount.setPrefixComponent(null);
+        }
     }
 
     /**
@@ -373,7 +425,16 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param amount the {@code Number} to set as amount.
      */
     public void setAmount(Number amount) {
-        this.amount.setValue(amount.toString());
+        setAmount(NumberFormat.getCurrencyInstance(getLocale()).format(amount));
+    }
+    
+    /**
+     * Sets the amount.
+     * 
+     * @param amount the {@code String} to set as amount.
+     */
+    public void setAmount(String amount) {
+        this.amount.setValue(amount.replaceAll("[^\\d.,\\h-]", "").replaceAll("\\h+$", ""));
     }
     
     /**
@@ -437,6 +498,16 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         super.setReadOnly(readOnly);
         amount.setReadOnly(readOnly);
         currency.setReadOnly(readOnly);
+    }
+    
+    /**
+     * Hides the currency combobox and instead shows the currency as pre- or postfix (according to locale) in amount field.
+     *
+     * @param readOnly a boolean value specifying whether the currency is put in read-only mode or not
+     */
+    public void setCurrencyReadOnly(boolean readOnly) {
+        currency.setVisible(!readOnly);
+        showCurrencyInAmount(readOnly);
     }
 
     @Override

@@ -261,4 +261,29 @@ public class MoneyFieldTest {
         
         assertEquals(2000580.04, model.getMoney().getNumber().doubleValue());
     }
+    
+    @Test
+    public void testReadOnlyCurrency() {
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        money.setCurrencyReadOnly(true);
+        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        
+        _setValue(money, FastMoney.of(-123.456, "EUR"));
+        assertEquals("€", amount.getPrefixComponent().getElement().getText());
+        
+        _setValue(money, FastMoney.of(-123.456, "ATS"));
+        assertEquals("öS", amount.getPrefixComponent().getElement().getText());
+        
+        _setValue(money, FastMoney.of(-123.456, "CNY"));
+        assertEquals("CN¥", amount.getPrefixComponent().getElement().getText());
+        
+        _setValue(money, FastMoney.of(-123.456, "INR"));
+        assertEquals("₹", amount.getPrefixComponent().getElement().getText());
+        
+        _setValue(money, FastMoney.of(-123.456, "USD"));
+        assertEquals("$", amount.getPrefixComponent().getElement().getText());
+        
+        _setValue(money, FastMoney.of(-123.456, "PLN"));
+        assertEquals("PLN", amount.getPrefixComponent().getElement().getText(), "interestingly this is not zł but PLN");
+    }
 }

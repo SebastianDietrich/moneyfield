@@ -20,8 +20,9 @@ public class View extends Div {
 
     public View() {
         UI.getCurrent().setLocale(new Locale("de", "DE"));
-        money = new MoneyField("Amount", true);
+        money = new MoneyField("Amount", "EUR", true);
         money.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        money.setCurrencyReadOnly(true);
         
         Button button = new Button("Ok");
         add(money, button);
