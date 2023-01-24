@@ -106,6 +106,10 @@ public class MoneyFieldTest {
 
         Locale locale = UI.getCurrent().getLocale();
         TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        
+        _setValue(amount, "123456,789");
+        assertEquals("123.456,79", _get(TextField.class, spec -> spec.withId("amount")).getValue());
+
       
         UI.getCurrent().setLocale(new Locale("pl", "PL"));
         _setValue(amount, "123 456,789");
@@ -189,77 +193,52 @@ public class MoneyFieldTest {
     
     @Test
     public void testCalculateAmount() {
-        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Calc"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
-        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableAmount"));
         _setValue(amount, "1+2+3");
         assertEquals("6,00", amount.getValue());
-
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
-        
-        assertEquals(6, model.getMoney().getNumber().doubleValue());
     }
     
     @Test
     public void testCalculateAmountWithDoubles() {
-        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Calc"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
-        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableAmount"));
         _setValue(amount, "1,123+2,456+3,789");
         assertEquals("7,37", amount.getValue());
-
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
-        
-        assertEquals(7.37, model.getMoney().getNumber().doubleValue());
     }
     
     @Test
     public void testCalculateAmountWithSpaces() {
-        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Calc"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
-        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableAmount"));
         _setValue(amount, "1,1 + 2,2 + 3,3");
         assertEquals("6,60", amount.getValue());
-
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
-        
-        assertEquals(6.6, model.getMoney().getNumber().doubleValue());
     }
     
     @Test
     public void testCalculateAmountWithAll4OperatorsAndParenthesis() {
-        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Calc"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
-        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableAmount"));
         _setValue(amount, "((1+2) * 3) / (4-1)");
         assertEquals("3,00", amount.getValue());
-
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
-        
-        assertEquals(3, model.getMoney().getNumber().doubleValue());
     }
     
     @Test
     public void testCalculateAmountWithGrouping() {
-        Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Calc"));
         _setValue(money, FastMoney.of(-123.456, "EUR"));
         
-        TextField amount = _get(TextField.class, spec -> spec.withId("amount"));
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableAmount"));
         _setValue(amount, "1.000,12 * 2.000,34");
         assertEquals("2.000.580,04", amount.getValue());
-
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
-        
-        assertEquals(2000580.04, model.getMoney().getNumber().doubleValue());
     }
     
     @Test

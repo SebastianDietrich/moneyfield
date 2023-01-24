@@ -35,7 +35,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     private static final long serialVersionUID = -6563463270512422984L;
     
     //depending on locale amounts can have different delimiters and group-length (e.g. 1,23,450 for India, 1 234 567 for Poland (\\h = whitespace))
-    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)\\d{1,4}([., \\h]\\d{2,4})*([.,]\\d+)?$");
+    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?$");
     private static final String NUMBER_CHARS = "0123456789., \u00a0"; //all allowed characters in a number (including space and &nbsp; for polish numbers)
     private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)(\\h*([-+*/]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
     
@@ -81,7 +81,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                     "' is not in the list of currency codes.");
         }
         amount = new TextField();
-        amount.setId("amount");
+        amount.setId(calculable ? "calculableAmount" : "amount");
         amount.setSizeUndefined();
 
         currency = new ComboBox<>();
