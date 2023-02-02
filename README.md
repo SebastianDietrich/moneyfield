@@ -1,5 +1,6 @@
 [![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/moneyfield)
 [![Stars on Vaadin Directory](https://img.shields.io/vaadin-directory/star/moneyfield.svg)](https://vaadin.com/directory/component/moneyfield)
+[![Build Status](https://github.com/SebastianDietrich/moneyfield/actions/workflows/maven.yml/badge.svg)](https://github.com/SebastianDietrich/moneyfield)
 
 # Moneyfield
 
@@ -11,11 +12,6 @@ The entered amount must match the locale (with optional grouping) - e.g. 1 234,5
 The amount gets rounded and formatted (with grouping) upon losing focus (e.g. 1,23,456.789 -> 1,23,456.79 for India).
 
 Optionally primitive arithmetic calculations (e.g. ((-1+2)*3 - 1)/-4) are allowed and calculated upon losing focus 
-
-
-## Development instructions
-[![Build Status](https://app.travis-ci.com/SebastianDietrich/moneyfield.svg?branch=main)](https://travis-ci.com/SebastianDietrich/moneyfield)
-
 
 
 ## Publishing to Vaadin Directory
