@@ -433,7 +433,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param amount the {@code String} to set as amount.
      */
     public void setAmount(String amount) {
-        this.amount.setValue(amount.replaceAll("^\\h", "").replaceAll("[^\\d.,\\h-]", "").replaceAll("\\h+$", ""));
+        this.amount.setValue(amount.replaceAll("[^\\d.,\\h-]", "").replaceAll("^\\h", "").replaceAll("\\h+$", ""));
     }
     
     /**
