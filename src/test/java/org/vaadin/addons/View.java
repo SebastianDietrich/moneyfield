@@ -22,24 +22,30 @@ public class View extends Div {
         UI.getCurrent().setLocale(new Locale("de", "DE"));
         calculableMoney = new MoneyField("Calc", "EUR", true);
         calculableMoney.setCurrencyReadOnly(true);
+        calculableMoney.setId("calculableMoney");
         
         money = new MoneyField("Amount", "EUR");
-        money.setCurrencyReadOnly(true);
+        money.setId("money");
         
-        Button button = new Button("Ok");
-        add(calculableMoney, money, button);
+        Button ok = new Button("Ok");
+        Button reload = new Button("Reload");
+        add(calculableMoney, money, ok, reload);
         
         model = new Model();
         binder = new Binder<>(Model.class);
         binder.bindInstanceFields(this);
+        binder.setBean(model);
         
-        button.addClickListener(buttonClickEvent -> {
+        ok.addClickListener(buttonClickEvent -> {
             try {
                 binder.writeBean(model);
             } catch (ValidationException e) {
-                // TODO Auto-generated catch block
                 assert false: "ValidationException thrown";
             }
+        });
+        
+        reload.addClickListener(buttonClickEvent -> {
+            binder.refreshFields();
         });
     }
 

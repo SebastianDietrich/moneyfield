@@ -4,7 +4,7 @@
 
     <groupId>org.vaadin.addons.e-movimento</groupId>
     <artifactId>moneyfield</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.2</version>
     <name>MoneyField</name>
     <description>Field to hold both monetary amount and currency</description>
     

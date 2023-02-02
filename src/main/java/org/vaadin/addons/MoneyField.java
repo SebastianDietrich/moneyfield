@@ -9,7 +9,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Currency;
 import java.util.List;
@@ -81,7 +80,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                     "' is not in the list of currency codes.");
         }
         amount = new TextField();
-        amount.setId(calculable ? "calculableAmount" : "amount");
+        amount.setId("amount");
         amount.setSizeUndefined();
 
         currency = new ComboBox<>();
@@ -124,7 +123,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
               setModelValue(Money.of(currencyFormat.parse(formattedAmount), currency.getValue()), true);
               this.setInvalid(false);
               return;
-          } catch (IllegalArgumentException | ParseException e) {
+          } catch (ParseException e) {
               //do nothing, just set the field invalid
           }
         }
@@ -140,8 +139,8 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      */
     private double eval(final String str, final com.ibm.icu.text.NumberFormat numberFormat) throws ParseException {
         return new Object() {
-            int pos = -1;
-            int ch;
+            private int pos = -1;
+            private int ch;
             
             void nextChar() {
                 ch = (++pos < str.length()) ? str.charAt(pos) : (char)-1;
@@ -158,9 +157,9 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
             
             double parse() throws ParseException {
                 nextChar();
-                double x = parseExpression();
-                if (pos < str.length()) throw new IllegalArgumentException("Unexpected: " + (char)ch);
-                return x;
+                double number = parseExpression();
+                if (pos < str.length()) throw new ParseException("Unexpected: " + (char)ch, pos);
+                return number;
             }
             
             // Grammar:
@@ -169,20 +168,20 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
             // factor = `+` factor | `-` factor | `(` expression `)` | factor `^` factor
             
             double parseExpression() throws ParseException {
-                double x = parseTerm();
+                double term = parseTerm();
                 for (;;) {
-                    if      (eat('+')) x += parseTerm(); // addition
-                    else if (eat('-')) x -= parseTerm(); // subtraction
-                    else return x;
+                    if      (eat('+')) term += parseTerm(); // addition
+                    else if (eat('-')) term -= parseTerm(); // subtraction
+                    else return term;
                 }
             }
             
             double parseTerm() throws ParseException {
-                double x = parseFactor();
+                double factor = parseFactor();
                 for (;;) {
-                    if      (eat('*')) x *= parseFactor(); // multiplication
-                    else if (eat('/')) x /= parseFactor(); // division
-                    else return x;
+                    if      (eat('*')) factor *= parseFactor(); // multiplication
+                    else if (eat('/')) factor /= parseFactor(); // division
+                    else return factor;
                 }
             }
             
@@ -190,21 +189,21 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                 if (eat('+')) return +parseFactor(); // unary plus
                 if (eat('-')) return -parseFactor(); // unary minus
                 
-                double x;
+                double number;
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
-                    x = parseExpression();
-                    if (!eat(')')) throw new IllegalArgumentException("Missing ')'");
+                    number = parseExpression();
+                    if (!eat(')')) throw new ParseException("Missing ')'", pos);
                 } else if (NUMBER_CHARS.indexOf(ch) >= 0) {
                     while (NUMBER_CHARS.indexOf(ch) >= 0) nextChar();
-                    x = numberFormat.parse(str.substring(startPos, this.pos)).doubleValue();
+                    number = numberFormat.parse(str.substring(startPos, pos)).doubleValue();
                 } else {
-                    throw new ParseException("Unexpected: " + (char)ch, this.pos);
+                    throw new ParseException("Unexpected: " + (char)ch, pos);
                 }
                 
-                if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+                if (eat('^')) number = Math.pow(number, parseFactor()); // exponentiation
                 
-                return x;
+                return number;
             }
         }.parse();
     }
@@ -374,7 +373,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
 
     @Override
     protected void setPresentationValue(MonetaryAmount monetaryAmount) {
-        setAmount(NumberFormat.getCurrencyInstance(getLocale()).format(monetaryAmount.getNumber().numberValue(BigDecimal.class)).replaceAll("[^\\d., -]", ""));
+        setAmount(monetaryAmount.getNumber());
         setCurrency(monetaryAmount.getCurrency().getCurrencyCode());
     }
 
@@ -420,7 +419,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
 
     /**
-     * Sets the amount.
+     * Sets the amount. The amount will be formatted given the currency-format of the current locale excluding the currency symbols.
      * 
      * @param amount the {@code Number} to set as amount.
      */
@@ -429,12 +428,12 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
     
     /**
-     * Sets the amount.
+     * Sets the amount. Removes all illegal characters (i.e. leading/tailing spaces and everything besides numbers, '-', comma and grouping symbols ('., ')
      * 
      * @param amount the {@code String} to set as amount.
      */
     public void setAmount(String amount) {
-        this.amount.setValue(amount.replaceAll("[^\\d.,\\h-]", "").replaceAll("\\h+$", ""));
+        this.amount.setValue(amount.replaceAll("^\\h", "").replaceAll("[^\\d.,\\h-]", "").replaceAll("\\h+$", ""));
     }
     
     /**
@@ -532,6 +531,13 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      */
     public void removeThemeVariants(TextFieldVariant... variants) {
         amount.removeThemeVariants(variants);
+    }
+    
+    @Override
+    public void setId(String id) {
+        super.setId(id);
+        amount.setId(id+".amount");
+        currency.setId(id+".currency");
     }
 
     /**
