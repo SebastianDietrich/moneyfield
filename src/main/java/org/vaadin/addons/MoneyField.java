@@ -34,9 +34,10 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     private static final long serialVersionUID = -6563463270512422984L;
     
     //depending on locale amounts can have different delimiters and group-length (e.g. 1,23,450 for India, 1 234 567 for Poland (\\h = whitespace))
-    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?$");
+    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?$");
     private static final String NUMBER_CHARS = "0123456789., \u00a0"; //all allowed characters in a number (including space and &nbsp; for polish numbers)
-    private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)(\\h*([-+*/]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
+    private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?)(\\h*([-+*/]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
+    
     
     /**
      * The amount part of this component.
@@ -91,7 +92,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         setValue(initialValue);
         
         amount.addValueChangeListener(listener -> {
-            if (StringUtils.isEmpty(amount.getValue())) return;
+            if (!listener.isFromClient()) return;
             evaluateAndSetAmount(calculable);
         });
         
@@ -113,11 +114,15 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     private void evaluateAndSetAmount(boolean calculable) {
         com.ibm.icu.text.NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(getLocale());
         com.ibm.icu.text.NumberFormat numberFormat = NumberFormat.getNumberInstance(getLocale());
-        String formattedAmount;
+
         String textualAmount = amount.getValue();
+        if (textualAmount.isBlank()) {
+            setModelValue(null, true);
+            return;
+        }
         if ((calculable ? CALCULABLE_AMOUNT_PATTERN : AMOUNT_PATTERN).matcher(textualAmount).matches()) {
           try {
-              formattedAmount = currencyFormat.format(calculable ? eval(textualAmount, numberFormat) : numberFormat.parse(textualAmount));
+              String formattedAmount = currencyFormat.format(calculable ? eval(textualAmount, numberFormat) : numberFormat.parse(textualAmount));
               setAmount(formattedAmount);
               if (StringUtils.isEmpty(currency.getValue())) return;
               setModelValue(Money.of(currencyFormat.parse(formattedAmount), currency.getValue()), true);
@@ -428,7 +433,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
     
     /**
-     * Sets the amount. Removes all illegal characters (i.e. leading/tailing spaces and everything besides numbers, '-', comma and grouping symbols ('., ')
+     * Sets the amount. Removes all characters possibly added by NumberFormat.format (e.g. currency-signs) i.e. leading/tailing spaces and everything besides numbers, '-', comma and grouping symbols ('., ')
      * 
      * @param amount the {@code String} to set as amount.
      */

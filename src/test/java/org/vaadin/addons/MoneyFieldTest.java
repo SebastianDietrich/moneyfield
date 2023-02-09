@@ -15,10 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.github.mvysny.kaributesting.v10.LocatorJ._assertOne;
-import static com.github.mvysny.kaributesting.v10.LocatorJ._click;
-import static com.github.mvysny.kaributesting.v10.LocatorJ._get;
-import static com.github.mvysny.kaributesting.v10.LocatorJ._setValue;
+import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -68,12 +65,13 @@ public class MoneyFieldTest {
         // which will walk the UI tree for us.
         _assertOne(View.class);
     }
-
+    
     @Test
     public void testSetAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
         MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(1, "EUR"));
+        
         assertEquals("1,00", _get(TextField.class, spec -> spec.withId("money.amount")).getValue());
 
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
@@ -81,10 +79,16 @@ public class MoneyFieldTest {
         assertEquals(1.0, model.getMoney().getNumber().doubleValue());
     }
     
+    private void setValue(TextField amount, String value) {
+        _setValue(amount, value);
+        _fireValueChange(amount);
+    }
+    
     @Test
     public void testSetNegativeAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
-        _setValue(amount, "-123,456");
+        setValue(amount, "-123,456");
+        
         assertEquals("-123,46", amount.getValue());
         
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
@@ -97,32 +101,32 @@ public class MoneyFieldTest {
         Locale locale = UI.getCurrent().getLocale();
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         
-        _setValue(amount, "123456,789");
+        setValue(amount, "123456,789");
         assertEquals("123.456,79", amount.getValue());
-        _setValue(amount, " 123456,789");
+        setValue(amount, " 123456,789");
         assertEquals("123.456,79", amount.getValue());
-        _setValue(amount, " 123.456,79");
+        setValue(amount, " 123.456,79");
         assertEquals("123.456,79", amount.getValue());
 
       
         UI.getCurrent().setLocale(new Locale("pl", "PL"));
-        _setValue(amount, "123 456,789");
+        setValue(amount, "123 456,789");
         assertEquals("123\u00a0456,79", amount.getValue(), "€ Money in polish locale should accept ' ' as thousands separator.");
-        _setValue(amount, "123\u00a0456,789");
+        setValue(amount, "123\u00a0456,789");
         assertEquals("123\u00a0456,79", amount.getValue(), "€ Money in polish locale should accept '\\u00a0' as thousands separator.");
-        _setValue(amount, "123456,789");
+        setValue(amount, "123456,789");
         assertEquals("123\u00a0456,79", amount.getValue(), "€ Money in polish locale should correct to '\u00a0' (non breaking space) as thousands separator.");
         
         UI.getCurrent().setLocale(new Locale("hi", "IN"));
-        _setValue(amount, "1,23,456.789"); //indians use a variable group-length
+        setValue(amount, "1,23,456.789"); //indians use a variable group-length
         assertEquals("1,23,456.79",amount.getValue(), "€ Money in indian locale should accept variable group-length.");
-        _setValue(amount, "987654.321"); //indians use a variable group-length
+        setValue(amount, "987654.321"); //indians use a variable group-length
         assertEquals("9,87,654.32", amount.getValue(), "€ Money in indian locale should correct to variable group-length.");
 
         UI.getCurrent().setLocale(new Locale("en", "US"));
-        _setValue(amount, "123,456.789");
+        setValue(amount, "123,456.789");
         assertEquals("123,456.79", amount.getValue());
-        _setValue(amount, "123456.789");
+        setValue(amount, "123456.789");
         assertEquals("123,456.79", amount.getValue());
         
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
@@ -136,7 +140,7 @@ public class MoneyFieldTest {
     @Test
     public void testChangeAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
-        _setValue(amount, "543,21");
+        setValue(amount, "543,21");
         assertEquals("543,21", amount.getValue());
 
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
@@ -158,7 +162,7 @@ public class MoneyFieldTest {
     @Test
     public void testSetAmountWithDotComma() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
-        _setValue(amount, "-5.214,12");
+        setValue(amount, "-5.214,12");
         assertEquals("-5.214,12", amount.getValue());
         
         _click(_get(Button.class, spec -> spec.withCaption("Ok")));
@@ -169,7 +173,7 @@ public class MoneyFieldTest {
     @Test
     public void testSetAmountWithNonNumericValue() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
-        _setValue(amount, "5..214,1234");
+        setValue(amount, "5..214,1234");
         assertEquals("5..214,1234", amount.getValue(), "amount should not be changed when entering illegal value");
         
         assertTrue(_get(MoneyField.class, spec -> spec.withCaption("Amount")).isInvalid());
@@ -178,42 +182,42 @@ public class MoneyFieldTest {
     @Test
     public void testSetAmountWithMatchingButStillNonNumericValue() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
-        _setValue(amount, "5..214,12");
+        setValue(amount, "5..214,12");
         assertTrue(_get(MoneyField.class, spec -> spec.withCaption("Amount")).isInvalid());
     }
     
     @Test
     public void testCalculateAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
-        _setValue(amount, "1+2+3");
+        setValue(amount, "1+2+3");
         assertEquals("6,00", amount.getValue());
     }
     
     @Test
     public void testCalculateAmountWithDoubles() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
-        _setValue(amount, "1,123+2,456+3,789");
+        setValue(amount, "1,123+2,456+3,789");
         assertEquals("7,37", amount.getValue());
     }
     
     @Test
     public void testCalculateAmountWithSpaces() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
-        _setValue(amount, "1,1 + 2,2 + 3,3");
+        setValue(amount, "1,1 + 2,2 + 3,3");
         assertEquals("6,60", amount.getValue());
     }
     
     @Test
     public void testCalculateAmountWithAll4OperatorsAndParenthesis() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
-        _setValue(amount, "((1+2) * 3) / (4-1)");
+        setValue(amount, "((1+2) * 3) / (4-1)");
         assertEquals("3,00", amount.getValue());
     }
     
     @Test
     public void testCalculateAmountWithGrouping() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
-        _setValue(amount, "1.000,12 * 2.000,34");
+        setValue(amount, "1.000,12 * 2.000,34");
         assertEquals("2.000.580,04", amount.getValue());
     }
     
