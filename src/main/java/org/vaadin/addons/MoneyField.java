@@ -87,7 +87,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         currency = new ComboBox<>();
         currency.setId("currency");
         currency.setItems(currencyCodes);
-        currency.setWidth(6, Unit.EM);  
+        currency.setWidth(5.45f, Unit.EM);  //smallest size so that currencies MWK, MMK, TMM just fit into the field
 
         setValue(initialValue);
         
@@ -106,6 +106,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         layout.setSizeUndefined();
         layout.add(amount, currency);
         layout.setFlexGrow(1, amount);
+        layout.setFlexGrow(0, currency);
         layout.setAlignItems(Alignment.END); // so that amount with label is aligned to currency
 
         getContent().add(layout);
@@ -501,7 +502,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         amount.setReadOnly(readOnly);
-        currency.setReadOnly(readOnly);
+        setCurrencyReadOnly(readOnly);
     }
     
     /**
@@ -510,8 +511,9 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param readOnly a boolean value specifying whether the currency is put in read-only mode or not
      */
     public void setCurrencyReadOnly(boolean readOnly) {
-        currency.setVisible(!readOnly);
         showCurrencyInAmount(readOnly);
+        currency.setVisible(!readOnly);
+        currency.setWidth(readOnly ? 0f : 5.45f, Unit.EM);
     }
 
     @Override
