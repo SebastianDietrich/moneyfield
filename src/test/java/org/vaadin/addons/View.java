@@ -3,6 +3,7 @@ package org.vaadin.addons;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
@@ -23,13 +24,15 @@ public class View extends Div {
         calculableMoney = new MoneyField("Calc", "EUR", true);
         calculableMoney.setCurrencyReadOnly(true);
         calculableMoney.setId("calculableMoney");
+        calculableMoney.setWidthFull();
         
         money = new MoneyField("Amount", "EUR");
         money.setId("money");
+        money.setWidthFull();
         
         Button ok = new Button("Ok");
         Button reload = new Button("Reload");
-        add(calculableMoney, money, ok, reload);
+        add(new HorizontalLayout(calculableMoney, money), ok, reload);
         
         model = new Model();
         binder = new Binder<>(Model.class);

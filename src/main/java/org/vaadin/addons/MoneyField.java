@@ -82,12 +82,12 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
         }
         amount = new TextField();
         amount.setId("amount");
-        amount.setWidth(3.60f, Unit.REM);  //smallest size so that small amounts like € 1,00 are just visible
+        amount.setMinWidth(3.60f, Unit.REM);  //smallest size so that small amounts like € 1,00 are just visible
 
         currency = new ComboBox<>();
         currency.setId("currency");
         currency.setItems(currencyCodes);
-        currency.setWidth(5.45f, Unit.REM);  //smallest size so that currencies MWK, MMK, TMM just fit into the field
+        currency.setWidth(5.45f, Unit.REM);  //smallest size so that currencies like MWK, MMK, TMM just fit into the field
 
         setValue(initialValue);
         
