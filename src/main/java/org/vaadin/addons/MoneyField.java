@@ -30,7 +30,7 @@ import org.javamoney.moneta.Money;
  * @author Sebastian Dietrich
  */
 @Tag("money-field")
-public class MoneyField extends AbstractCompositeField<Div, MoneyField, MonetaryAmount> implements HasLabel, HasSize, HasValidation {
+public class MoneyField extends AbstractCompositeField<Div, MoneyField, MonetaryAmount> implements HasLabel, HasSize, HasValidation, HasStyle, Focusable<MoneyField> {
     private static final long serialVersionUID = -6563463270512422984L;
     
     //depending on locale amounts can have different delimiters and group-length (e.g. 1,23,450 for India, 1 234 567 for Poland (\\h = whitespace))
@@ -62,6 +62,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      */
     public MoneyField(boolean calculable) {
         this((MonetaryAmount) null, calculable);
+        this.getElement();
     }
 
     /**
@@ -588,6 +589,14 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     @Override
     public void setInvalid(boolean invalid) {
         amount.setInvalid(invalid);
+    }
+    
+    /**
+     * Sets the focus on amount
+     */
+    @Override
+    public void focus() {
+        amount.focus();
     }
 
 

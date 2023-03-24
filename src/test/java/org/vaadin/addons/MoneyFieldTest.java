@@ -48,7 +48,7 @@ public class MoneyFieldTest {
     }
 
     @Test
-    public void smokeTest() {
+    void smokeTest() {
         // Smoke test is a quick test to check that the basic machinery is in place and works.
         // The analogy would be to turn on an electric device (e.g. a coffee maker)
         // then turn it off immediately without even checking whether it actually works or not,
@@ -67,7 +67,7 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testSetAmount() {
+    void testSetAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
         MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         _setValue(money, FastMoney.of(1, "EUR"));
@@ -85,7 +85,7 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testSetNegativeAmount() {
+    void testSetNegativeAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         setValue(amount, "-123,456");
         
@@ -97,7 +97,7 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testLocale() {
+    void testLocale() {
         Locale locale = UI.getCurrent().getLocale();
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         
@@ -138,7 +138,7 @@ public class MoneyFieldTest {
     
     
     @Test
-    public void testChangeAmount() {
+    void testChangeAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         setValue(amount, "543,21");
         assertEquals("543,21", amount.getValue());
@@ -149,7 +149,7 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testChangeAmountInModel() {
+    void testChangeAmountInModel() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
         model.setMoney(FastMoney.of(987.65, "USD"));
 
@@ -160,7 +160,7 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testSetAmountWithDotComma() {
+    void testSetAmountWithDotComma() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         setValue(amount, "-5.214,12");
         assertEquals("-5.214,12", amount.getValue());
@@ -171,7 +171,7 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testSetAmountWithNonNumericValue() {
+    void testSetAmountWithNonNumericValue() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         setValue(amount, "5..214,1234");
         assertEquals("5..214,1234", amount.getValue(), "amount should not be changed when entering illegal value");
@@ -180,49 +180,49 @@ public class MoneyFieldTest {
     }
     
     @Test
-    public void testSetAmountWithMatchingButStillNonNumericValue() {
+    void testSetAmountWithMatchingButStillNonNumericValue() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         setValue(amount, "5..214,12");
         assertTrue(_get(MoneyField.class, spec -> spec.withCaption("Amount")).isInvalid());
     }
     
     @Test
-    public void testCalculateAmount() {
+    void testCalculateAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "1+2+3");
         assertEquals("6,00", amount.getValue());
     }
     
     @Test
-    public void testCalculateAmountWithDoubles() {
+    void testCalculateAmountWithDoubles() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "1,123+2,456+3,789");
         assertEquals("7,37", amount.getValue());
     }
     
     @Test
-    public void testCalculateAmountWithSpaces() {
+    void testCalculateAmountWithSpaces() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "1,1 + 2,2 + 3,3");
         assertEquals("6,60", amount.getValue());
     }
     
     @Test
-    public void testCalculateAmountWithAll4OperatorsAndParenthesis() {
+    void testCalculateAmountWithAll4OperatorsAndParenthesis() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "((1+2) * 3) / (4-1)");
         assertEquals("3,00", amount.getValue());
     }
     
     @Test
-    public void testCalculateAmountWithGrouping() {
+    void testCalculateAmountWithGrouping() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "1.000,12 * 2.000,34");
         assertEquals("2.000.580,04", amount.getValue());
     }
     
     @Test
-    public void testReadOnlyCurrency() {
+    void testReadOnlyCurrency() {
         MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
         money.setCurrencyReadOnly(true);
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
