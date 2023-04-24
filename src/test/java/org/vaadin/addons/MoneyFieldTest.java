@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -244,5 +245,15 @@ public class MoneyFieldTest {
         
         _setValue(money, FastMoney.of(-123.456, "PLN"));
         assertEquals("PLN", amount.getPrefixComponent().getElement().getText(), "interestingly this is not zł but PLN");
+    }
+    
+    @Test
+    void testClear() {
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        money.clear();
+
+        TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
+        assertEquals("", amount.getValue());
+        assertNull(_get(ComboBox.class, spec -> spec.withId("money.currency")).getValue());
     }
 }

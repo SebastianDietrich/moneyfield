@@ -380,8 +380,18 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
 
     @Override
     protected void setPresentationValue(MonetaryAmount monetaryAmount) {
+        if (monetaryAmount == null) {
+            clear();
+            return;
+        }
         setAmount(monetaryAmount.getNumber());
         setCurrency(monetaryAmount.getCurrency().getCurrencyCode());
+    }
+    
+    @Override
+    public void clear() {
+        amount.clear();
+        currency.clear();
     }
 
     /**
