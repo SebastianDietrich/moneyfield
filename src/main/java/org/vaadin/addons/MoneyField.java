@@ -1,5 +1,6 @@
 package org.vaadin.addons;
 
+//import com.ibm.icu.number.NumberFormatter;
 import com.ibm.icu.text.NumberFormat; //don't use java.text.NumberFormat, since it does not support variable-width groups (as e.g. for indian formats)
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Currency;
 import java.util.List;
@@ -36,7 +38,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     //depending on locale amounts can have different delimiters and group-length (e.g. 1,23,450 for India, 1 234 567 for Poland (\\h = whitespace))
     private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?$");
     private static final String NUMBER_CHARS = "0123456789., \u00a0"; //all allowed characters in a number (including space and &nbsp; for polish numbers)
-    private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?)(\\h*([-+*/]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
+    private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?)(\\h*([-+*/^]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
     
     
     /**
@@ -139,12 +141,12 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     
    
     /**
-     * Evaluate arithmetic expression including +, -, *, /, ()
+     * Evaluate arithmetic expression including +, -, *, /, (), ^ (exponentiation)
      * 
      * @see https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form (removed functions like sin, sqrt, ...)
      * @throws ParseException when the expression cannot be parsed
      */
-    private double eval(final String str, final com.ibm.icu.text.NumberFormat numberFormat) throws ParseException {
+    private BigDecimal eval(final String str, final com.ibm.icu.text.NumberFormat numberFormat) throws ParseException {
         return new Object() {
             private int pos = -1;
             private int ch;
@@ -162,9 +164,9 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                 return false;
             }
             
-            double parse() throws ParseException {
+            BigDecimal parse() throws ParseException {
                 nextChar();
-                double number = parseExpression();
+                BigDecimal number = parseExpression();
                 if (pos < str.length()) throw new ParseException("Unexpected: " + (char)ch, pos);
                 return number;
             }
@@ -174,41 +176,49 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
             // term = factor | term `*` factor | term `/` factor
             // factor = `+` factor | `-` factor | `(` expression `)` | factor `^` factor
             
-            double parseExpression() throws ParseException {
-                double term = parseTerm();
+            BigDecimal parseExpression() throws ParseException {
+                BigDecimal term = parseTerm();
                 for (;;) {
-                    if      (eat('+')) term += parseTerm(); // addition
-                    else if (eat('-')) term -= parseTerm(); // subtraction
-                    else return term;
+                    if (eat('+')) return term.add(parseTerm()); // addition
+                    if (eat('-')) return term.subtract(parseTerm()); // subtraction
+                    return term;
                 }
             }
             
-            double parseTerm() throws ParseException {
-                double factor = parseFactor();
+            BigDecimal parseTerm() throws ParseException {
+                BigDecimal factor = parseFactor();
                 for (;;) {
-                    if      (eat('*')) factor *= parseFactor(); // multiplication
-                    else if (eat('/')) factor /= parseFactor(); // division
-                    else return factor;
+                    if (eat('*')) return factor.multiply(parseFactor()); // multiplication
+                    if (eat('/')) return factor.divide(parseFactor()); // division
+                    return factor;
                 }
             }
             
-            double parseFactor() throws ParseException {
-                if (eat('+')) return +parseFactor(); // unary plus
-                if (eat('-')) return -parseFactor(); // unary minus
+            BigDecimal parseFactor() throws ParseException {
+                if (eat('+')) return parseFactor(); // unary plus
+                if (eat('-')) return parseFactor().negate(); // unary minus
                 
-                double number;
+                BigDecimal number;
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
                     number = parseExpression();
                     if (!eat(')')) throw new ParseException("Missing ')'", pos);
                 } else if (NUMBER_CHARS.indexOf(ch) >= 0) {
                     while (NUMBER_CHARS.indexOf(ch) >= 0) nextChar();
-                    number = numberFormat.parse(str.substring(startPos, pos)).doubleValue();
+                    number = new BigDecimal(numberFormat.parse(str.substring(startPos, pos)).toString());
                 } else {
                     throw new ParseException("Unexpected: " + (char)ch, pos);
                 }
                 
-                if (eat('^')) number = Math.pow(number, parseFactor()); // exponentiation
+                if (eat('^')) { // exponentiation
+                    BigDecimal exponent = parseFactor();
+                    if (exponent.scale() <= 0)
+                        return number.pow(exponent.intValue());
+                    if (number.compareTo(BigDecimal.valueOf(number.doubleValue())) == 0)
+                        return BigDecimal.valueOf(Math.pow(number.doubleValue(), exponent.doubleValue()));
+                    throw new ParseException("Exponentiation on large numbers is not available for exponents with decimals like " + exponent.toString(), pos);    
+                    //if necessary this could be implemented using Cornell Universities implementation of core math functionalities https://arxiv.org/src/0908.3030v3/anc
+                }
                 
                 return number;
             }
@@ -441,6 +451,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @param amount the {@code Number} to set as amount.
      */
     public void setAmount(Number amount) {
+        //setAmount(NumberFormatter.withLocale(getLocale()).unit(com.ibm.icu.util.Currency.getInstance(currency.getValue())).format(amount).toString());
         setAmount(NumberFormat.getCurrencyInstance(getLocale()).format(amount));
     }
     
