@@ -188,10 +188,24 @@ public class MoneyFieldTest {
     }
     
     @Test
+    void testSetAmountWithBigDecimal() {
+        TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
+        setValue(amount, "71000000000000,01");
+        assertEquals("71.000.000.000.000,01", amount.getValue());
+    }
+    
+    @Test
     void testCalculateAmount() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "1+2+3");
         assertEquals("6,00", amount.getValue());
+    }
+    
+    @Test
+    void testCalculateAmountWithBigDecimal() {
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
+        setValue(amount, "71000000000000,01+71000000000000,01");
+        assertEquals("142.000.000.000.000,02", amount.getValue());
     }
     
     @Test
@@ -209,10 +223,10 @@ public class MoneyFieldTest {
     }
     
     @Test
-    void testCalculateAmountWithAll4OperatorsAndParenthesis() {
+    void testCalculateAmountWithAll5OperatorsAndParenthesis() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
-        setValue(amount, "((1+2) * 3) / (4-1)");
-        assertEquals("3,00", amount.getValue());
+        setValue(amount, "(((1+2) * 3) / (4-1))^2,5");
+        assertEquals("15,59", amount.getValue());
     }
     
     @Test

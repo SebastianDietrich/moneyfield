@@ -179,18 +179,18 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
             BigDecimal parseExpression() throws ParseException {
                 BigDecimal term = parseTerm();
                 for (;;) {
-                    if (eat('+')) return term.add(parseTerm()); // addition
-                    if (eat('-')) return term.subtract(parseTerm()); // subtraction
-                    return term;
+                    if (eat('+')) term = term.add(parseTerm()); // addition
+                    else if (eat('-')) term = term.subtract(parseTerm()); // subtraction
+                    else return term;
                 }
             }
             
             BigDecimal parseTerm() throws ParseException {
                 BigDecimal factor = parseFactor();
                 for (;;) {
-                    if (eat('*')) return factor.multiply(parseFactor()); // multiplication
-                    if (eat('/')) return factor.divide(parseFactor()); // division
-                    return factor;
+                    if (eat('*')) factor = factor.multiply(parseFactor()); // multiplication
+                    else if (eat('/')) factor = factor.divide(parseFactor()); // division
+                    else return factor;
                 }
             }
             
