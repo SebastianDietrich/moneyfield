@@ -4,12 +4,12 @@
 
     <groupId>org.vaadin.addons.e-movimento</groupId>
     <artifactId>moneyfield</artifactId>
-    <version>2.1.9</version>
+    <version>2.2.0</version>
     <name>MoneyField</name>
     <description>Field to hold both monetary amount and currency</description>
     
     <properties>
-        <vaadin.version>23.3.32</vaadin.version> <!-- see https://mvnrepository.com/artifact/com.vaadin/vaadin -->
+        <vaadin.version>24.4.10</vaadin.version> <!-- see https://mvnrepository.com/artifact/com.vaadin/vaadin -->
 
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -22,11 +22,11 @@
 
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
 
-        <moneta.version>1.4.2</moneta.version> <!-- see https://mvnrepository.com/artifact/org.javamoney/moneta -->
-        <icu4j.version>74.2</icu4j.version> <!-- see https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
+        <moneta.version>1.4.4</moneta.version> <!-- see https://mvnrepository.com/artifact/org.javamoney/moneta -->
+        <icu4j.version>75.1</icu4j.version> <!-- see https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
 
-        <karibu-testing.version>1.3.24</karibu-testing.version> <!-- https://mvnrepository.com/artifact/com.github.mvysny.kaributesting/karibu-testing-v10 -->
-        <junit-jupiter.version>5.10.1</junit-jupiter.version> <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+        <karibu-testing.version>2.1.8</karibu-testing.version> <!-- https://mvnrepository.com/artifact/com.github.mvysny.kaributesting/karibu-testing-v24 -->
+        <junit-jupiter.version>5.11.0</junit-jupiter.version> <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
     </properties>
 
     <organization>
@@ -141,7 +141,7 @@
         <!-- dependency for ui-testing without browser -->
         <dependency>
             <groupId>com.github.mvysny.kaributesting</groupId>
-            <artifactId>karibu-testing-v10</artifactId>
+            <artifactId>karibu-testing-v24</artifactId>
             <version>${karibu-testing.version}</version>
             <scope>test</scope>
         </dependency>

@@ -6,6 +6,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 
 import java.util.Locale;
 
@@ -269,5 +270,13 @@ public class MoneyFieldTest {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         assertEquals("", amount.getValue());
         assertNull(_get(ComboBox.class, spec -> spec.withId("money.currency")).getValue());
+    }
+    
+    @Test
+    void testAddRemoveThemeVariant() {
+        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        
+        money.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        money.removeThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
     }
 }
