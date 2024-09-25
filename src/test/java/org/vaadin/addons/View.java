@@ -25,6 +25,7 @@ public class View extends Div {
         calculableMoney.setCurrencyReadOnly(true);
         calculableMoney.setId("calculableMoney");
         calculableMoney.setWidthFull();
+        calculableMoney.setErrorMessage("ungültige Eingabe");
         
         money = new MoneyField("Amount", "EUR");
         money.setId("money");

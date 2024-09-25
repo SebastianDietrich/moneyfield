@@ -11,6 +11,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.Currency;
 import java.util.List;
@@ -64,7 +65,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      */
     public MoneyField(boolean calculable) {
         this((MonetaryAmount) null, calculable);
-        this.getElement();
+        //this.getElement();
     }
 
     /**
@@ -132,7 +133,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
               setModelValue(Money.of(currencyFormat.parse(formattedAmount), currency.getValue()), true);
               this.setInvalid(false);
               return;
-          } catch (ParseException e) {
+          } catch (ParseException | ArithmeticException e) {
               //do nothing, just set the field invalid
           }
         }
@@ -146,7 +147,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
      * @see https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form (removed functions like sin, sqrt, ...)
      * @throws ParseException when the expression cannot be parsed
      */
-    private BigDecimal eval(final String str, final com.ibm.icu.text.NumberFormat numberFormat) throws ParseException {
+    private BigDecimal eval(final String str, final com.ibm.icu.text.NumberFormat numberFormat) throws ParseException, ArithmeticException {
         return new Object() {
             private int pos = -1;
             private int ch;
@@ -164,7 +165,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                 return false;
             }
             
-            BigDecimal parse() throws ParseException {
+            BigDecimal parse() throws ParseException, ArithmeticException {
                 nextChar();
                 BigDecimal number = parseExpression();
                 if (pos < str.length()) throw new ParseException("Unexpected: " + (char)ch, pos);
@@ -176,7 +177,7 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
             // term = factor | term `*` factor | term `/` factor
             // factor = `+` factor | `-` factor | `(` expression `)` | factor `^` factor
             
-            BigDecimal parseExpression() throws ParseException {
+            BigDecimal parseExpression() throws ParseException, ArithmeticException {
                 BigDecimal term = parseTerm();
                 for (;;) {
                     if (eat('+')) term = term.add(parseTerm()); // addition
@@ -185,16 +186,18 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
                 }
             }
             
-            BigDecimal parseTerm() throws ParseException {
+            BigDecimal parseTerm() throws ParseException, ArithmeticException {
                 BigDecimal factor = parseFactor();
                 for (;;) {
                     if (eat('*')) factor = factor.multiply(parseFactor()); // multiplication
-                    else if (eat('/')) factor = factor.divide(parseFactor()); // division
-                    else return factor;
+                    else if (eat('/')) {
+                        factor = factor.divide(parseFactor(), 
+                            numberFormat.getMaximumFractionDigits(), RoundingMode.valueOf(numberFormat.getRoundingMode())); // division
+                    } else return factor;
                 }
             }
-            
-            BigDecimal parseFactor() throws ParseException {
+
+            BigDecimal parseFactor() throws ParseException, ArithmeticException {
                 if (eat('+')) return parseFactor(); // unary plus
                 if (eat('-')) return parseFactor().negate(); // unary minus
                 
@@ -516,7 +519,9 @@ public class MoneyField extends AbstractCompositeField<Div, MoneyField, Monetary
     }
 
     /**
-     * Sets the read-only mode of this {@code MoneyField} to given mode. The user can't change the values when in read-only mode.
+     * Sets the read-only mode of this {@code MoneyField} to given mode. The user can't change the values when in read-only mode. Note that
+     * read-only affects both the value and the currency. If you want them to behave differently you need to call setCurrencyReadOnly()
+     * *after* calling this method.
      *
      * @param readOnly a boolean value specifying whether the component is put in read-only mode or not
      */

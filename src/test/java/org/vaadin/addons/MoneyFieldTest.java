@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import static com.github.mvysny.kaributesting.v10.LocatorJ.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -71,12 +73,12 @@ public class MoneyFieldTest {
     @Test
     void testSetAmount() {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withLabel("Amount"));
         _setValue(money, FastMoney.of(1, "EUR"));
         
         assertEquals("1,00", _get(TextField.class, spec -> spec.withId("money.amount")).getValue());
 
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        _click(_get(Button.class, spec -> spec.withText("Ok")));
         
         assertEquals(1.0, model.getMoney().getNumber().doubleValue());
     }
@@ -93,7 +95,7 @@ public class MoneyFieldTest {
         
         assertEquals("-123,46", amount.getValue());
         
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        _click(_get(Button.class, spec -> spec.withText("Ok")));
         
         assertEquals(-123.46, ((View)UI.getCurrent().getChildren().findFirst().get()).getModel().getMoney().getNumber().doubleValue());
     }
@@ -131,7 +133,7 @@ public class MoneyFieldTest {
         setValue(amount, "123456.789");
         assertEquals("123,456.79", amount.getValue());
         
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        _click(_get(Button.class, spec -> spec.withText("Ok")));
         
         assertEquals(123456.79, ((View)UI.getCurrent().getChildren().findFirst().get()).getModel().getMoney().getNumber().doubleValue());
         
@@ -145,7 +147,7 @@ public class MoneyFieldTest {
         setValue(amount, "543,21");
         assertEquals("543,21", amount.getValue());
 
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        _click(_get(Button.class, spec -> spec.withText("Ok")));
         
         assertEquals(543.21, ((View)UI.getCurrent().getChildren().findFirst().get()).getModel().getMoney().getNumber().doubleValue());
     }
@@ -155,7 +157,7 @@ public class MoneyFieldTest {
         Model model = ((View)UI.getCurrent().getChildren().findFirst().get()).getModel();
         model.setMoney(FastMoney.of(987.65, "USD"));
 
-        _click(_get(Button.class, spec -> spec.withCaption("Reload")));
+        _click(_get(Button.class, spec -> spec.withText("Reload")));
         
         assertEquals("987,65", _get(TextField.class, spec -> spec.withId("money.amount")).getValue());
         assertEquals("USD", _get(ComboBox.class, spec -> spec.withId("money.currency")).getValue());
@@ -167,7 +169,7 @@ public class MoneyFieldTest {
         setValue(amount, "-5.214,12");
         assertEquals("-5.214,12", amount.getValue());
         
-        _click(_get(Button.class, spec -> spec.withCaption("Ok")));
+        _click(_get(Button.class, spec -> spec.withText("Ok")));
         
         assertEquals(-5214.12, ((View)UI.getCurrent().getChildren().findFirst().get()).getModel().getMoney().getNumber().doubleValue());
     }
@@ -178,14 +180,14 @@ public class MoneyFieldTest {
         setValue(amount, "5..214,1234");
         assertEquals("5..214,1234", amount.getValue(), "amount should not be changed when entering illegal value");
         
-        assertTrue(_get(MoneyField.class, spec -> spec.withCaption("Amount")).isInvalid());
+        assertTrue(_get(MoneyField.class, spec -> spec.withLabel("Amount")).isInvalid());
     }
     
     @Test
     void testSetAmountWithMatchingButStillNonNumericValue() {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         setValue(amount, "5..214,12");
-        assertTrue(_get(MoneyField.class, spec -> spec.withCaption("Amount")).isInvalid());
+        assertTrue(_get(MoneyField.class, spec -> spec.withLabel("Amount")).isInvalid());
     }
     
     @Test
@@ -203,6 +205,13 @@ public class MoneyFieldTest {
     }
     
     @Test
+    void testSetCalculableAmountWithBigDecimal() {
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
+        setValue(amount, "71000000000000,01");
+        assertEquals("71.000.000.000.000,01", amount.getValue());
+    }
+    
+    @Test
     void testCalculateAmountWithBigDecimal() {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "71000000000000,01+71000000000000,01");
@@ -214,6 +223,22 @@ public class MoneyFieldTest {
         TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
         setValue(amount, "1,123+2,456+3,789");
         assertEquals("7,37", amount.getValue());
+    }
+    
+    @Test
+    void testCalculateAmountWithDividingDoubles() {
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
+        setValue(amount, "1458,15/12,98");
+        assertEquals("112,34", amount.getValue());
+    }
+    
+    @Test
+    void testCalculateAmountWithDividingByZero() {
+        TextField amount = _get(TextField.class, spec -> spec.withId("calculableMoney.amount"));
+        setValue(amount, "1/0");
+        assertEquals("1/0", amount.getValue(), "amount should not be changed when entering illegal value");
+        
+        assertTrue(_get(MoneyField.class, spec -> spec.withLabel("Calc")).isInvalid());
     }
     
     @Test
@@ -239,7 +264,7 @@ public class MoneyFieldTest {
     
     @Test
     void testReadOnlyCurrency() {
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withLabel("Amount"));
         money.setCurrencyReadOnly(true);
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         
@@ -264,7 +289,7 @@ public class MoneyFieldTest {
     
     @Test
     void testClear() {
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withLabel("Amount"));
         money.clear();
 
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
@@ -274,9 +299,24 @@ public class MoneyFieldTest {
     
     @Test
     void testAddRemoveThemeVariant() {
-        MoneyField money = _get(MoneyField.class, spec -> spec.withCaption("Amount"));
+        MoneyField money = _get(MoneyField.class, spec -> spec.withLabel("Amount"));
         
         money.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         money.removeThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+    }
+    
+    @Test
+    void testSetCurrencyReadOnly() {
+        MoneyField money = _get(MoneyField.class, spec -> spec.withLabel("Amount"));
+        TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
+        ComboBox<String> currency =  _get(ComboBox.class, spec -> spec.withId("money.currency"));
+
+        assertNull(amount.getPrefixComponent());
+        assertTrue(currency.isVisible());
+        
+        money.setCurrencyReadOnly(true);
+        
+        assertNotNull(amount.getPrefixComponent());
+        assertFalse(currency.isVisible());
     }
 }
