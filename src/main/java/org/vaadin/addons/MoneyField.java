@@ -1,15 +1,16 @@
 package org.vaadin.addons;
 
-//import com.ibm.icu.number.NumberFormatter;
 import com.ibm.icu.text.NumberFormat; //don't use java.text.NumberFormat, since it does not support variable-width groups (as e.g. for indian formats)
-import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.customfield.CustomField;
+import com.vaadin.flow.component.customfield.CustomFieldVariant;
 import com.vaadin.flow.component.html.Div;
-//import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-//import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 
@@ -20,6 +21,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
@@ -568,22 +570,30 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     }
 
     /**
-     * Adds theme variants to the component.
-     *
-     * @param variants theme variants to add
+     * {@inheritDoc}
      */
-    public void addThemeVariants(TextFieldVariant... variants) {
-        amount.addThemeVariants(variants);
+    @Override
+    public void addThemeVariants(CustomFieldVariant... variants) {
+        super.addThemeVariants(variants);
+        Stream.of(variants).map(CustomFieldVariant::getVariantName).forEach(variantName -> {
+            amount.addThemeVariants(TextFieldVariant.valueOf(variantName));
+            currency.addThemeVariants(ComboBoxVariant.valueOf(variantName));
+            });
     }
-
+    
     /**
-     * Removes theme variants from the component.
-     *
-     * @param variants theme variants to remove
+     * {@inheritDoc}
      */
-    public void removeThemeVariants(TextFieldVariant... variants) {
-        amount.removeThemeVariants(variants);
+    @Override
+    public void removeThemeVariants(CustomFieldVariant... variants) {
+        super.removeThemeVariants(variants);
+        Stream.of(variants).map(CustomFieldVariant::getVariantName).forEach(variantName -> {
+            amount.removeThemeVariants(TextFieldVariant.valueOf(variantName));
+            currency.removeThemeVariants(ComboBoxVariant.valueOf(variantName));
+            });
     }
+    
+    
     
     @Override
     public void setId(String id) {
