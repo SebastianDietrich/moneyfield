@@ -486,6 +486,17 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     }
 
     /**
+     * This property is set to true when the control value is invalid.
+     *
+     * @param invalid the boolean value to set
+     */
+    @Override
+    public void setInvalid(boolean invalid) {
+        super.setInvalid(invalid);
+        amount.setInvalid(invalid);
+    }
+
+    /**
      * Handle component enable state when the enabled state changes.
      * <p>
      * This sets the enabled state of both the amount and currency fields.
