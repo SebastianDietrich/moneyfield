@@ -147,11 +147,30 @@
         </dependency>
 
         <!-- dependency for manual ui-testing -->
-       <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>11.0.18</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>11.0.18</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-annotations</artifactId>
+            <version>11.0.18</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- dependency for testing commercial vaadin components with moneyfield -->
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -209,6 +228,7 @@
                 </executions>
             </plugin>
 
+            <!-- for testing via maven -->
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
@@ -385,7 +405,7 @@
                             <skip>true</skip>
                         </configuration>
                     </plugin>
-                    
+
                     <!-- Runs the integration tests (*IT) after the server is started -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

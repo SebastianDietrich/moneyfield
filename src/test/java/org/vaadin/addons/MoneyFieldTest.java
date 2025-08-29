@@ -301,6 +301,7 @@ public class MoneyFieldTest {
         TextField amount = _get(TextField.class, spec -> spec.withId("money.amount"));
         assertEquals("", amount.getValue());
         assertNull(_get(ComboBox.class, spec -> spec.withId("money.currency")).getValue());
+        assertNull(_get(MoneyField.class, spec -> spec.withId("money")).getValue());
     }
 
     @Test

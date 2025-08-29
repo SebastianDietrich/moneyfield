@@ -404,6 +404,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public void clear() {
         amount.clear();
         currency.clear();
+        super.clear();
     }
 
     /**
@@ -524,16 +525,6 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         this.setMinWidth(MIN_WIDTH_OF_AMOUNTS+newWidth, Unit.REM);
     }
 
-    @Override
-    public void setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {
-        amount.setRequiredIndicatorVisible(requiredIndicatorVisible);
-    }
-
-    @Override
-    public boolean isRequiredIndicatorVisible() {
-        return amount.isRequiredIndicatorVisible();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -563,49 +554,6 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         super.setId(id);
         amount.setId(id+".amount");
         currency.setId(id+".currency");
-    }
-
-    /**
-     * Gets the error to show when the input value is invalid.
-     * <p>
-     * This property is not synchronized automatically from the client side, so the returned value may not be the same as in client side.
-     * </p>
-     *
-     * @return the {@code errorMessage} property from the webcomponent
-     */
-    @Override
-    public String getErrorMessage() {
-        return amount.getErrorMessage();
-    }
-
-    /**
-     * Sets the error to show when the input value is invalid.
-     *
-     * @param errorMessage the String value to set
-     */
-    @Override
-    public void setErrorMessage(String errorMessage) {
-        amount.setErrorMessage(errorMessage);
-    }
-
-    /**
-     * This property is set to true when the control value is invalid.
-     *
-     * @return the {@code invalid} property from the webcomponent
-     */
-    @Override
-    public boolean isInvalid() {
-        return amount.isInvalid();
-    }
-
-    /**
-     * This property is set to true when the control value is invalid.
-     *
-     * @param invalid the boolean value to set
-     */
-    @Override
-    public void setInvalid(boolean invalid) {
-        amount.setInvalid(invalid);
     }
 
     /**
