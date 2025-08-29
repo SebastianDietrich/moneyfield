@@ -9,12 +9,17 @@ build/
 .DS_Store
 
 # The following files are generated/updated by vaadin-maven-plugin or vaadin-gradle-plugin
-node_modules/
-frontend/generated/
+!**/node_modules/
+!**/frontend/generated/
 pnpmfile.js
 .npmrc
 webpack.generated.js
 vite.generated.ts
+vite.config.ts.*
+
+# Re-generated at every build - for us it is ok that they might slightly differ every build
+package.json
+package-lock.json
 
 # Browser drivers for local integration tests
 drivers/

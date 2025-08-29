@@ -1,7 +1,6 @@
 package org.vaadin.addons;
 
 import com.ibm.icu.text.NumberFormat; //don't use java.text.NumberFormat, since it does not support variable-width groups (as e.g. for indian formats)
-import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -37,27 +36,24 @@ import org.javamoney.moneta.Money;
  *
  * @author Sebastian Dietrich
  */
-@Tag("money-field")
 public class MoneyField extends CustomField<MonetaryAmount> {
     private static final float MIN_WIDTH_OF_AMOUNTS = 3.6f; //to hold 1 digit amounts including currency icon like "€ 1,00"
     private static final float WIDTH_OF_CURRENCIES = 5.45f; //smallest size so that currencies like MWK, MMK, TMM just fit into the field
 
     private static final long serialVersionUID = -6563463270512422984L;
-    
+
     //depending on locale amounts can have different delimiters and group-length (e.g. 1,23,450 for India, 1 234 567 for Poland (\\h = whitespace))
     private static final Pattern AMOUNT_PATTERN = Pattern.compile("^\\s*([-+]?)(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?$");
     private static final String NUMBER_CHARS = "0123456789., \u00a0"; //all allowed characters in a number (including space and &nbsp; for polish numbers)
     private static final Pattern CALCULABLE_AMOUNT_PATTERN = Pattern.compile("^\\s*\\(*([-+]?(\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)?)(\\h*([-+*/^]\\h*\\(*(\\h*[-+]?\\d{1,4}([.,\\h]?\\d{2,4})*([.,]\\d+)?)\\h*\\)*\\h*)*)$");
-    
-//    private final NativeLabel label;
-    
+
     /**
      * The amount part of this component.
      */
     private final TextField amount;
-    
+
     /**
-     * The currency part of this component.
+     * The currency part of this component. ComboBox, so one can search in the potentially long list of available currencies
      */
     private final ComboBox<String> currency;
 
@@ -68,7 +64,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public MoneyField() {
         this(false);
     }
-    
+
     /**
      * Constructs an empty {@code MoneyField} that can possibly be calculated.
      * @param calculable if the field allows basic arithmetic expressions to be calculated
@@ -90,36 +86,23 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         if (initialValue != null && !currencyCodes.contains(initialValue.getCurrency().getCurrencyCode())) {
             throw new IllegalArgumentException(
                 "The initial values currency code '" +
-                    initialValue.getCurrency().getCurrencyCode() +
+                        initialValue.getCurrency().getCurrencyCode() +
                     "' is not in the list of currency codes.");
         }
-        
         this.calculable = calculable;
 
         amount = new TextField();
-        amount.setId("amount");
+        amount.setId("Amount");
+        amount.setAriaLabel("Amount");
         amount.setMinWidth(MIN_WIDTH_OF_AMOUNTS, Unit.REM);
 
         currency = new ComboBox<>();
-        currency.setId("currency");
+        currency.setId("Currency");
+        currency.setAriaLabel("Currency");
         currency.setItems(currencyCodes);
         currency.setWidth(WIDTH_OF_CURRENCIES, Unit.REM);  
 
-        //label for both amount and currency (to overlap both when necessary)
-//        label = new NativeLabel();
-//        label.setFor(amount);
-        
         setValue(initialValue);
-        
-//        amount.addValueChangeListener(listener -> {
-//            if (!listener.isFromClient()) return;
-//            evaluateAndSetAmount(calculable);
-//        });
-//        
-//        currency.addValueChangeListener(listener -> {
-//            if (StringUtils.isEmpty(amount.getValue()) || StringUtils.isEmpty(currency.getValue())) return;
-//            evaluateAndSetAmount(calculable);
-//        });
 
         HorizontalLayout amountAndCurrencyLayout = new HorizontalLayout();
         amountAndCurrencyLayout.setSpacing(false);
@@ -127,10 +110,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         amountAndCurrencyLayout.setFlexGrow(1, amount);
         amountAndCurrencyLayout.setFlexGrow(0, currency);
         amountAndCurrencyLayout.setAlignItems(Alignment.END); // so that amount with label is aligned to currency
-        
-//        VerticalLayout labelAndMoneyLayout = new VerticalLayout(label, amountAndCurrencyLayout);
-//        labelAndMoneyLayout.setSpacing(false);
-        
+
         this.setMinWidth(MIN_WIDTH_OF_AMOUNTS+WIDTH_OF_CURRENCIES, Unit.REM);
         this.add(amountAndCurrencyLayout);
     }
@@ -143,7 +123,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public MoneyField(MonetaryAmount initialValue) {
         this(initialValue, getAvailableCurrencyCodes(), false);
     }
-    
+
     /**
      * Constructs an empty {@code MoneyField} with the given initial value and formatter.
      *
@@ -173,7 +153,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         this();
         setCurrency(currency);
     }
-    
+
     /**
      * Constructs an empty {@code MoneyField} with the given label and initial value for the currency.
      *
@@ -185,7 +165,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         setLabel(label);
         setCurrency(currency);
     }
-    
+
     /**
      * Constructs an empty {@code MoneyField} with the given label and initial value for the currency.
      *
@@ -197,7 +177,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         setLabel(label);
         setCurrency(currency);
     }
-    
+
     /**
      * Constructs an empty {@code MoneyField} with the given label and initial value for the currency.
      *
@@ -209,7 +189,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         setLabel(label);
         setCurrency(currencyCode);
     }
-    
+
     /**
      * Constructs an empty, possibly calculable {@code MoneyField} with the given label and initial value for the currency.
      *
@@ -235,7 +215,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public MoneyField(String label) {
         this(label, false);
     }
-    
+
     /**
      * Constructs an empty {@code MoneyField} with the given label that can be possibly calculated.
      *
@@ -256,7 +236,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public MoneyField(String label, MonetaryAmount initialValue) {
         this(label, initialValue, false);
     }
-    
+
     /**
      * Constructs {@code MoneyField} with the given label and initial value.
      *
@@ -281,7 +261,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public MoneyField(String label, MonetaryAmount initialValue, String placeholder) {
         this(label, initialValue, placeholder, false);
     }
-    
+
     /**
      * Constructs a {@code MoneyField} with the given label, an initial value and placeholder text.
      *
@@ -307,7 +287,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         setAmount(monetaryAmount.getNumber());
         setCurrency(monetaryAmount.getCurrency().getCurrencyCode());
     }
-    
+
     @Override
     protected MonetaryAmount generateModelValue() {
         com.ibm.icu.text.NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(getLocale());
@@ -318,21 +298,21 @@ public class MoneyField extends CustomField<MonetaryAmount> {
             return null;
         }
         if ((calculable ? CALCULABLE_AMOUNT_PATTERN : AMOUNT_PATTERN).matcher(textualAmount).matches()) {
-          try {
-              String formattedAmount = currencyFormat.format(calculable ? eval(textualAmount, numberFormat) : numberFormat.parse(textualAmount));
-              setAmount(formattedAmount);
-              if (StringUtils.isEmpty(currency.getValue())) return null;
-              this.setInvalid(false);
-              return Money.of(currencyFormat.parse(formattedAmount), currency.getValue());
-          } catch (ParseException | ArithmeticException e) {
-              //do nothing, just set the field invalid
-          }
+            try {
+                String formattedAmount = currencyFormat.format(calculable ? eval(textualAmount, numberFormat) : numberFormat.parse(textualAmount));
+                setAmount(formattedAmount);
+                if (StringUtils.isEmpty(currency.getValue())) return null;
+                this.setInvalid(false);
+                return Money.of(currencyFormat.parse(formattedAmount), currency.getValue());
+            } catch (ParseException | ArithmeticException e) {
+                //do nothing, just set the field invalid
+            }
         }
         this.setInvalid(true);
         return null;
     }
-    
-   
+
+
     /**
      * Evaluate arithmetic expression including +, -, *, /, (), ^ (exponentiation)
      * 
@@ -343,11 +323,11 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         return new Object() {
             private int pos = -1;
             private int ch;
-            
+
             void nextChar() {
                 ch = (++pos < str.length()) ? str.charAt(pos) : (char)-1;
             }
-            
+
             boolean eat(int charToEat) {
                 while (ch == ' ') nextChar();
                 if (ch == charToEat) {
@@ -356,19 +336,19 @@ public class MoneyField extends CustomField<MonetaryAmount> {
                 }
                 return false;
             }
-            
+
             BigDecimal parse() throws ParseException, ArithmeticException {
                 nextChar();
                 BigDecimal number = parseExpression();
                 if (pos < str.length()) throw new ParseException("Unexpected: " + (char)ch, pos);
                 return number;
             }
-            
+
             // Grammar:
             // expression = term | expression `+` term | expression `-` term
             // term = factor | term `*` factor | term `/` factor
             // factor = `+` factor | `-` factor | `(` expression `)` | factor `^` factor
-            
+
             BigDecimal parseExpression() throws ParseException, ArithmeticException {
                 BigDecimal term = parseTerm();
                 for (;;) {
@@ -377,7 +357,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
                     else return term;
                 }
             }
-            
+
             BigDecimal parseTerm() throws ParseException, ArithmeticException {
                 BigDecimal factor = parseFactor();
                 for (;;) {
@@ -392,7 +372,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
             BigDecimal parseFactor() throws ParseException, ArithmeticException {
                 if (eat('+')) return parseFactor(); // unary plus
                 if (eat('-')) return parseFactor().negate(); // unary minus
-                
+
                 BigDecimal number;
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
@@ -404,7 +384,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
                 } else {
                     throw new ParseException("Unexpected: " + (char)ch, pos);
                 }
-                
+
                 if (eat('^')) { // exponentiation
                     BigDecimal exponent = parseFactor();
                     if (exponent.scale() <= 0)
@@ -414,12 +394,12 @@ public class MoneyField extends CustomField<MonetaryAmount> {
                     throw new ParseException("Exponentiation on large numbers is not available for exponents with decimals like " + exponent.toString(), pos);    
                     //if necessary this could be implemented using Cornell Universities implementation of core math functionalities https://arxiv.org/src/0908.3030v3/anc
                 }
-                
+
                 return number;
             }
         }.parse();
     }
-    
+
     @Override
     public void clear() {
         amount.clear();
@@ -476,7 +456,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         //setAmount(NumberFormatter.withLocale(getLocale()).unit(com.ibm.icu.util.Currency.getInstance(currency.getValue())).format(amount).toString());
         setAmount(NumberFormat.getCurrencyInstance(getLocale()).format(amount));
     }
-    
+
     /**
      * Sets the amount. Removes all characters possibly added by NumberFormat.format (e.g. currency-signs) i.e. leading/tailing spaces and everything besides numbers, '-', comma and grouping symbols ('., ')
      * 
@@ -484,26 +464,6 @@ public class MoneyField extends CustomField<MonetaryAmount> {
      */
     public void setAmount(String amount) {
         this.amount.setValue(amount.replaceAll("[^\\d.,\\h-]", "").replaceAll("^\\h", "").replaceAll("\\h+$", ""));
-    }
-    
-    /**
-     * Set the label of the component to the given text.
-     *
-     * @param label the label text to set or {@code null} to clear
-     */
-    @Override
-    public void setLabel(String label) {
-        amount.setLabel(label);
-    }
-
-    /**
-     * Gets the label of the component.
-     *
-     * @return the label of the component or {@code null} if no label has been set
-     */
-    @Override
-    public String getLabel() {
-        return amount.getLabel();
     }
 
     /**
@@ -549,7 +509,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         amount.setReadOnly(readOnly);
         setCurrencyReadOnly(readOnly);
     }
-    
+
     /**
      * Hides the currency combobox and instead shows the currency as pre- or postfix (according to locale) in amount field.
      * Changes the min-width of the component accordingly.
@@ -569,32 +529,35 @@ public class MoneyField extends CustomField<MonetaryAmount> {
         amount.setRequiredIndicatorVisible(requiredIndicatorVisible);
     }
 
+    @Override
+    public boolean isRequiredIndicatorVisible() {
+        return amount.isRequiredIndicatorVisible();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void addThemeVariants(CustomFieldVariant... variants) {
         super.addThemeVariants(variants);
-        Stream.of(variants).map(CustomFieldVariant::getVariantName).forEach(variantName -> {
-            amount.addThemeVariants(TextFieldVariant.valueOf(variantName));
-            currency.addThemeVariants(ComboBoxVariant.valueOf(variantName));
-            });
+        Stream.of(variants).map(CustomFieldVariant::name).forEach(name -> {
+            amount.addThemeVariants(TextFieldVariant.valueOf(name));
+            currency.addThemeVariants(ComboBoxVariant.valueOf(name));
+        });
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void removeThemeVariants(CustomFieldVariant... variants) {
         super.removeThemeVariants(variants);
-        Stream.of(variants).map(CustomFieldVariant::getVariantName).forEach(variantName -> {
-            amount.removeThemeVariants(TextFieldVariant.valueOf(variantName));
-            currency.removeThemeVariants(ComboBoxVariant.valueOf(variantName));
-            });
+        Stream.of(variants).map(CustomFieldVariant::name).forEach(name -> {
+            amount.removeThemeVariants(TextFieldVariant.valueOf(name));
+            currency.removeThemeVariants(ComboBoxVariant.valueOf(name));
+        });
     }
-    
-    
-    
+
     @Override
     public void setId(String id) {
         super.setId(id);
@@ -644,7 +607,7 @@ public class MoneyField extends CustomField<MonetaryAmount> {
     public void setInvalid(boolean invalid) {
         amount.setInvalid(invalid);
     }
-    
+
     /**
      * Sets the focus on amount
      */

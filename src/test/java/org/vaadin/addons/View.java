@@ -22,18 +22,19 @@ public class View extends Div {
 
     public View() {
         UI.getCurrent().setLocale(new Locale("de", "DE"));
-        calculableMoney = new MoneyField("Calc", "EUR", true);
+        calculableMoney = new MoneyField("Calculable", "EUR", true);
+        calculableMoney.setLabel("Calculable");
         calculableMoney.setId("calculableMoney");
         calculableMoney.setMinWidth(11f, Unit.REM);
         calculableMoney.setWidthFull();
         calculableMoney.setErrorMessage("ungültige Eingabe");
         
-        money = new MoneyField("Amountsdf as asdf asdf d", "EUR");
+        money = new MoneyField("Not-Calculable", "EUR");
         money.setId("money");
         money.setMinWidth(11.5f, Unit.REM);
         money.setWidthFull();
         
-        calculableFixedCurrency = new MoneyField("Calc2", "EUR", true);
+        calculableFixedCurrency = new MoneyField("Calculable with fixed currency", "EUR", true);
         calculableFixedCurrency.setCurrencyReadOnly(true);
         calculableFixedCurrency.setId("calculableFixedCurrency");
         calculableFixedCurrency.setMinWidth(6f, Unit.REM);
@@ -41,7 +42,7 @@ public class View extends Div {
         calculableFixedCurrency.setErrorMessage("ungültige Eingabe");
         
       
-        readOnlyMoney = new MoneyField("Amount", "EUR");
+        readOnlyMoney = new MoneyField("ReadOnly Money", "EUR");
         readOnlyMoney.setId("readOnlyMoney");
         readOnlyMoney.setAmount(8888);
         readOnlyMoney.setReadOnly(true);
@@ -50,7 +51,7 @@ public class View extends Div {
         
         Button ok = new Button("Ok");
         Button reload = new Button("Reload");
-        add(new HorizontalLayout(calculableMoney, money, new TextField("asdf"), calculableFixedCurrency, readOnlyMoney), ok, reload);
+        add(new HorizontalLayout(calculableMoney, money, new TextField("TextField"), calculableFixedCurrency, readOnlyMoney), ok, reload);
         
         model = new Model();
         binder = new Binder<>(Model.class);
